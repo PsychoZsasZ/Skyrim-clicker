@@ -1,37 +1,61 @@
-const CACHE_NAME = "skyrim-cache-v1";
-const ASSETS = [
-  "index.html",
-  "styles.css",      // if you have a separate CSS file
-  "main.js",         // your JS bundle (or list each JS file)
-  "manifest.json",
-  "icons/icon-192.png",
-  "icons/icon-512.png"
-  // add any other images / sounds / fonts you want cached
+// Bump this when you deploy a new build
+const CACHE_NAME = "northern-path-v1";
+
+const OFFLINE_ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./skyrim-map.jpg",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
-// Install: cache core files
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(OFFLINE_ASSETS))
   );
+  self.skipWaiting();
 });
 
-// Activate: cleanup old caches
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.map(key => (key === CACHE_NAME ? null : caches.delete(key)))
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       )
     )
   );
+  self.clients.claim();
 });
 
-// Fetch: serve from cache, fall back to network
 self.addEventListener("fetch", event => {
+  const req = event.request;
+
+  // Only handle same-origin GET requests
+  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+    caches.match(req).then(cached => {
+      if (cached) return cached;
+
+      return fetch(req)
+        .then(res => {
+          const resClone = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, resClone));
+          return res;
+        })
+        .catch(() => {
+          // If it's a navigation request and we're offline, fallback to index.html
+          if (req.mode === "navigate") {
+            return caches.match("./index.html");
+          }
+        });
     })
   );
 });
