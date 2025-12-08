@@ -977,6 +977,10 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
 </main>
 </div>
 <script>
+
+let SPLASH_MIN_MS = 1500; // how long (in ms) the splash should show at least
+let SPLASH_START = performance.now();
+  
 (() => {
 "use strict";
 
@@ -5377,8 +5381,19 @@ function setupMobileControls() {
 }
 function hideSplashScreen() {
   const s = document.getElementById("splash-screen");
-  if (s) {
+  if (!s) return;
+
+  const elapsed = performance.now() - SPLASH_START;
+  const remaining = SPLASH_MIN_MS - elapsed;
+
+  const doHide = () => {
     s.classList.add("splash-hidden");
+  };
+
+  if (remaining > 0) {
+    setTimeout(doHide, remaining);
+  } else {
+    doHide();
   }
 }
 function init(){
@@ -5461,6 +5476,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
