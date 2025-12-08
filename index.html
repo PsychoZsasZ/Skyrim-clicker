@@ -1,0 +1,5363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Norther Path Skyrim RPG</title>
+
+  <!-- Mobile viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA: theme + manifest -->
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+<meta charset="UTF-8">
+<title>The Northern Path • Skyrim-Style HTML RPG</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ...all your existing CSS... */
+
+  /* ---------------------------------
+     📱 MOBILE LAYOUT TWEAKS
+     ---------------------------------*/
+  @media (max-width: 768px) {
+    body {
+      padding: 8px;
+    }
+
+    .frame {
+      max-width: 100%;
+      border-radius: 0;
+    }
+
+    .frame-body {
+      grid-template-columns: 1fr; /* stack world + side panel */
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+    }
+
+    .action-btn {
+      flex: 1 1 calc(50% - 8px);
+      padding: 10px 8px;
+      font-size: 0.8rem;
+    }
+  }
+@media (max-width: 768px) {
+  .mobile-main-btn {
+    font-size: 0.9rem;
+    padding: 12px 10px;
+  }
+}
+.blackmarket-banner {
+  background: rgba(40, 0, 0, 0.6);
+  border-left: 4px solid #aa0000;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #ffb7b7;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.blackmarket-mode .shop-container {
+  background: rgba(20, 20, 20, 0.75) !important;
+  border: 1px solid #552222 !important;
+}
+
+.blackmarket-mode .inv-header {
+  color: #ff6666 !important;
+}
+.thu-um-line {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 4px 0;
+  text-shadow: 0 0 6px rgba(120,200,255,0.8);
+}
+.stat-pill .value{font-weight:600;color:var(--accent)}
+.stats-race{font-size:.75rem;color:var(--text-soft);margin-top:2px;}
+.race-modal-inner {
+  width: min(960px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.96);
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 20px;
+}
+
+.race-modal-inner h2 {
+  font-family: "Cinzel", serif;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 1rem;
+  margin: 0 0 6px;
+}
+
+.race-modal-inner p {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.race-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.race-card {
+  border-radius: 12px;
+  border: 1px solid rgba(55, 65, 81, 0.95);
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 1), rgba(3, 7, 18, 1));
+  padding: 8px 9px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+}
+
+.race-card h3 {
+  margin: 0 0 4px;
+  font-family: "Cinzel", serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.race-card .race-tagline {
+  font-size: 0.76rem;
+  color: var(--text-soft);
+}
+
+.race-card .race-power {
+  margin-top: 4px;
+  font-size: 0.76rem;
+}
+
+.race-card .race-mini {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--text-soft);
+}
+
+.race-card:hover {
+  border-color: rgba(212, 175, 55, 0.9);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7);
+}
+
+#race-modal .race-card.selected {
+  outline: 2px solid #e0c36b;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+}
+
+/* New character name + summary section */
+
+.race-name-section {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.race-name-header {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.race-name-label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+#character-name-input {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+#character-name-input::placeholder {
+  opacity: 0.6;
+}
+
+.race-summary {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+
+.race-confirm-btn {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(90deg, #a77b3e, #c9a35a);
+  color: #1a1207;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.race-confirm-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+:root{--bg:#030507;--bg-alt:#06080d;--card:#090d14;--accent:#d4af37;--accent-soft:rgba(212,175,55,.12);--danger:#f97373;--text:#e5e7eb;--text-soft:#9ca3af;--border:#1f2933;--radius-lg:16px;--radius-xl:22px;--shadow-soft:0 18px 45px rgba(0,0,0,.85);}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0,rgba(148,163,184,.22),transparent 55%),radial-gradient(circle at 80% 0,rgba(55,65,81,.45),transparent 60%),radial-gradient(circle at 50% 100%,rgba(15,23,42,.65),#02040a);color:var(--text);display:flex;align-items:stretch;justify-content:center;padding:20px;}
+.frame{width:100%;max-width:1120px;background:linear-gradient(145deg,rgba(7,10,18,.96),rgba(3,6,13,.98));border-radius:var(--radius-xl);box-shadow:var(--shadow-soft);border:1px solid rgba(148,163,184,.3);display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.frame:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;border:1px solid rgba(212,175,55,.15);box-shadow:0 0 0 1px rgba(15,23,42,.8) inset,0 0 40px rgba(0,0,0,.9) inset;}
+.frame-header{padding:16px 24px 12px;border-bottom:1px solid var(--border);background:radial-gradient(circle at top,rgba(15,23,42,.9),rgba(3,7,18,.98));position:relative;z-index:1;}
+.header-top{display:flex;justify-content:center;align-items:center;position:relative;margin-bottom:8px}
+.title{font-family:"Cinzel",serif;font-size:1.6rem;letter-spacing:.28em;text-transform:uppercase;font-weight:600;color:#f9fafb;text-align:center;padding:2px 0;display:flex;align-items:center;gap:10px;}
+.title:before,.title:after{content:"";flex:1;border-bottom:1px solid rgba(212,175,55,.35);opacity:.7;}
+.subtitle{font-size:.88rem;color:var(--text-soft);text-align:center;max-width:650px;margin:0 auto 10px;}
+.compass-bar{margin:4px auto 0;max-width:540px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:radial-gradient(circle at top,rgba(15,23,42,.95),rgba(3,7,18,.98));font-size:.76rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;padding:4px 14px;}
+.compass-center{flex:1;text-align:center;color:var(--accent);font-family:"Cinzel",serif}
+.frame-body{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(260px,1fr);overflow:hidden;min-height:560px;}
+@media(max-width:860px){.frame-body{grid-template-columns:minmax(0,1fr)}}
+.world-panel{border-right:1px solid var(--border);display:flex;flex-direction:column;background:radial-gradient(circle at top left,rgba(15,23,42,.9),rgba(3,7,18,.98));}
+.scene{padding:14px 22px 10px;border-bottom:1px solid rgba(31,41,55,.9);display:flex;flex-direction:column;gap:6px;position:relative;}
+.scene:after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-1px;width:130px;border-bottom:1px solid rgba(212,175,55,.55);opacity:.6;}
+.scene-location{font-size:.76rem;text-transform:uppercase;letter-spacing:.22em;color:var(--text-soft);font-family:"Cinzel",serif;}
+.scene-title-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.scene-event-note{font-size: 0.85em;opacity: 0.9;}
+.scene-title{font-size:1.05rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-family:"Cinzel",serif;}
+.scene-time{font-size:.8rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:.12em;}
+.scene-subtitle{font-size:.87rem;color:#d1d5db}
+.scene-danger{font-size:.8rem;color:var(--text-soft);opacity:.92;}
+.scene-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.scene-tag{font-size:.74rem;padding:3px 9px;border-radius:999px;background:rgba(15,23,42,.92);border:1px solid rgba(148,163,184,.4);color:var(--text-soft);text-transform:uppercase;letter-spacing:.14em;}
+.map-shell{padding:8px 18px 4px;border-bottom:1px solid rgba(31,41,55,.9)}
+.map-header{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text-soft);padding:0 2px 6px;font-family:"Cinzel",serif;}
+.map-header .region{color:var(--accent)}
+.map-header .hint{font-size:.68rem;letter-spacing:.14em}
+.map-container{
+  position:relative;
+  height:170px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(148,163,184,.5);
+
+  /* NEW: map image as base layer */
+  background-image:
+    url("file:///C:/Users/LPP.Dylan.Brown/Documents/Test/skyrim-map.jpg"),
+    radial-gradient(circle at 10% 0,rgba(248,250,252,.15),transparent 70%),
+    linear-gradient(145deg,#292524,#1f2937);
+  background-size:cover, 100% 100%, 100% 100%;
+  background-position:center, center, center;
+  background-repeat:no-repeat;
+
+  box-shadow:inset 0 0 18px rgba(0,0,0,.8);
+}
+.map-paper{position:absolute;inset:0;background-image:linear-gradient(0deg,rgba(15,23,42,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.16) 1px,transparent 1px);background-size:26px 26px;opacity:.45;pointer-events:none;}
+.map-locations span{position:absolute;font-size:.75rem;color:#f9fafb;text-shadow:0 0 4px #000;font-family:"Cinzel",serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:.08s;}
+.map-locations span:hover{transform:translateY(-1px);text-shadow:0 0 10px #facc15;color:var(--accent)}
+.map-locations .whiterun{left:45%;top:48%}
+.map-locations .solitude{left:20%;top:18%}
+.map-locations .windhelm{right:13%;top:26%}
+.map-locations .riften{right:18%;bottom:16%}
+.map-locations .markarth{left:12%;bottom:22%}
+.map-marker{position:absolute;width:18px;height:18px;border-radius:999px;border:2px solid #f9fafb;box-shadow:0 0 10px rgba(248,250,252,.9);transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,var(--accent),#b45309);z-index:3;}
+.map-marker-inner{width:7px;height:7px;border-radius:999px;background:#111827}
+/* Make the whole event-log area taller and let the list fill it */
+.log-shell {
+  margin-top: 12px;
+  height: 600px;           /* 🔹 Increase or tweak this value to taste */
+  display: flex;
+  flex-direction: column;
+}
+/* --- Mobile layout tweaks --- */
+@media (max-width: 768px) {
+  /* Make the log a bit shorter so it fits better above the buttons */
+  .log-shell {
+    height: 260px;
+  }
+
+  /* Extra spacing when the log is moved under the stats panel */
+  .log-shell.mobile-in-panel {
+    margin-top: 12px;
+  }
+}
+.log-header{display:flex;align-items:center;justify-content:space-between;font-size:.8rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text-soft);padding:2px 3px 6px;}
+.log-header span{font-family:"Cinzel",serif}
+.log-header:after{content:"";flex:1;margin-left:10px;border-bottom:1px solid rgba(148,163,184,.4);opacity:.7;}
+.log-container {
+  flex: 1;                 /* 🔹 Fills the remaining height inside log-shell */
+  overflow-y: auto;
+  padding: 6px 0;          /* optional: a bit of breathing room */
+}
+.log{margin:0;padding:0;list-style:none;font-size:.9rem;display:flex;flex-direction:column;gap:6px}
+.log-entry{padding:7px 9px;background:rgba(3,7,18,.9);border-radius:10px;border:1px solid rgba(31,41,55,.9);}
+/* Enemy encounters / combat threats */
+.log-entry.log-enemy {
+    background: rgba(180, 40, 40, 0.25);
+    border-left: 3px solid #b42121;
+}
+
+/* Exploration, travel, environment events */
+.log-entry.log-event {
+    background: rgba(70, 130, 180, 0.25); /* steelblue tone */
+    border-left: 3px solid #4682b4;
+}
+
+/* Loot, rewards, level-ups */
+.log-entry.log-loot,
+.log-entry.log-quest {
+    background: rgba(212, 175, 55, 0.25); /* gold */
+    border-left: 3px solid #d4af37;
+}
+
+/* System messages (neutral) */
+.log-entry.log-system {
+    background: rgba(200, 200, 200, 0.18);
+    border-left: 3px solid #aaa;
+}
+
+/* Optional: make the text pop slightly */
+.log-entry {
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    color: #f0f0f0; /* Skyrim vibe */
+}
+.rarity-tag{font-size:.72rem;text-transform:uppercase;letter-spacing:.16em;margin-left:4px}
+.rarity-common{color:#e5e7eb}.rarity-fine{color:#22c55e}.rarity-superior{color:#38bdf8}.rarity-epic{color:#a855f7}
+.side-panel{display:flex;flex-direction:column;background:radial-gradient(circle at top right,rgba(30,64,175,.45),rgba(3,7,18,.98));}
+
+/* TABS: wrapped so all are reachable */
+.hud-tabs{
+  display:flex;
+  flex-wrap:wrap;                           /* allow 2 rows of tabs */
+  border-bottom:1px solid var(--border);
+  background:rgba(3,7,18,.98);
+  flex-shrink:0;                            /* never collapse tabs */
+}
+
+                                       /* up to 3 per row, then wrap */
+.hud-tab{flex:1 1 33%;min-width:0;padding:8px 6px;border:none;cursor:pointer;background:transparent;color:var(--text-soft);font-size:.78rem;text-transform:uppercase;letter-spacing:.18em;font-family:"Cinzel",serif;border-right:1px solid var(--border);transition:.12s;white-space:nowrap;}
+.hud-tab:last-child{border-right:none;}
+.hud-tab.active{background:radial-gradient(circle at top,rgba(15,23,42,.95),rgba(3,7,18,.98));color:var(--accent);}
+.hud-tab:not(.active):hover{background:rgba(15,23,42,.7);}
+.hud-panel{display:none;flex:1;min-height:0}
+.hud-panel.active{display:flex;flex-direction:column}
+.hud-rep-row {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+.stats{padding:14px 18px 14px;border-bottom:1px solid var(--border);background:linear-gradient(160deg,rgba(9,12,20,.97),rgba(5,8,15,.98));}
+.stats-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.stats-name{font-family:"Cinzel",serif;font-weight:600;font-size:1rem;letter-spacing:.16em;text-transform:uppercase;}
+.stats-level{font-size:.8rem;color:var(--text-soft)}
+.resource-row{display:flex;flex-direction:column;gap:6px;margin:7px 0 5px}
+.resource-label{font-size:.76rem;text-transform:uppercase;letter-spacing:.16em;color:var(--text-soft);font-family:"Cinzel",serif;}
+.bar-wrapper{background:rgba(3,7,18,.96);border-radius:999px;border:1px solid rgba(55,65,81,.9);overflow:hidden;height:14px;position:relative;}
+.bar-fill{height:100%;width:50%;border-radius:inherit;transition:width .18s}
+.bar-fill.health{background:linear-gradient(90deg,#b91c1c,#fecaca)}
+.bar-fill.stamina{background:linear-gradient(90deg,#16a34a,#bbf7d0)}
+.bar-fill.magicka{background:linear-gradient(90deg,#1d4ed8,#bfdbfe)}
+.bar-text{position:absolute;inset:0;font-size:.72rem;display:flex;align-items:center;justify-content:center;color:#f9fafb;text-shadow:0 0 6px #000;font-weight:600;}
+.stats-row{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.stat-pill{flex:1;padding:6px 8px;border-radius:12px;background:rgba(7,11,20,.96);border:1px solid rgba(55,65,81,.95);font-size:.78rem;display:flex;justify-content:space-between;align-items:baseline;}
+.stat-pill .label{color:var(--text-soft);text-transform:uppercase;letter-spacing:.12em}
+.stat-pill .value{font-weight:600;color:var(--accent)}
+.enemy-preview{padding:10px 18px 8px;border-bottom:1px solid var(--border);background:linear-gradient(160deg,rgba(9,12,20,.97),rgba(5,8,15,.98));}
+.enemy-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:.78rem;}
+.enemy-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.16em;color:var(--text-soft);font-family:"Cinzel",serif;}
+.enemy-name{font-family:"Cinzel",serif;font-size:.86rem;}
+.enemy-body{display:flex;flex-direction:column;gap:4px;}
+.enemy-meta{font-size:.75rem;color:var(--text-soft);}
+.actions{padding:12px 18px 16px;display:flex;flex-direction:column;gap:10px}
+.actions-group-label{font-size:.76rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text-soft);margin-bottom:2px;font-family:"Cinzel",serif;}
+.button-row{display:flex;flex-wrap:wrap;gap:7px}
+.action-btn{border:none;border-radius:999px;padding:7px 11px;font-size:.8rem;cursor:pointer;background:rgba(7,11,20,.98);color:var(--text);border:1px solid rgba(75,85,99,.95);display:inline-flex;align-items:center;gap:6px;transition:.12s;font-family:"Cinzel",serif;text-transform:uppercase;letter-spacing:.12em;}
+.action-btn.small{padding:5px 9px;font-size:.75rem}
+.action-btn .hotkey{font-size:.7rem;padding:2px 5px;border-radius:999px;border:1px solid rgba(55,65,81,.9);color:var(--text-soft);text-transform:none;letter-spacing:0;}
+.action-btn.primary{background:radial-gradient(circle at top,rgba(212,175,55,.22),rgba(7,11,20,.98));border-color:rgba(212,175,55,.75);}
+.action-btn.danger{border-color:rgba(248,113,113,.9);background:radial-gradient(circle at top,rgba(127,29,29,.6),rgba(7,11,20,.98));}
+.action-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.action-btn:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.6);background:radial-gradient(circle at top,rgba(212,175,55,.32),rgba(7,11,20,.98));border-color:rgba(212,175,55,.95);}
+.potion-type-btn.active{border-color:rgba(212,175,55,.9);background:radial-gradient(circle at top,rgba(212,175,55,.3),rgba(7,11,20,.98));}
+.equip-panel-inner,.shout-panel-inner,.bestiary-panel-inner{padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px;}
+.equip-header,.shout-header,.bestiary-header{font-size:.8rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text-soft);font-family:"Cinzel",serif;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px;}
+.equip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.equip-slot{border-radius:12px;border:1px solid rgba(55,65,81,.9);background:radial-gradient(circle at top,rgba(15,23,42,.9),rgba(3,7,18,.98));padding:8px;font-size:.8rem;min-height:52px;display:flex;flex-direction:column;justify-content:space-between;}
+.equip-label{text-transform:uppercase;letter-spacing:.14em;font-family:"Cinzel",serif;color:var(--text-soft);font-size:.72rem;margin-bottom:4px;}
+.equip-item.empty{color:rgba(148,163,184,.8);font-style:italic}
+.equip-section {margin-bottom: 1.5rem;}
+.equip-section-player {padding-bottom: 1.25rem;border-bottom: 1px solid rgba(255,255,255,0.08);}
+.equip-section-companion {margin-top: 1.25rem;}.equip-header {display: flex;justify-content: space-between;align-items: baseline;font-size: 0.9rem;letter-spacing: 0.15em;text-transform: uppercase;margin-bottom: 0.5rem;}
+.equip-subheader{font-size: 0.75rem;opacity: 0.7;}
+.inventory-list,.shop-list,.shout-list,.bestiary-list{margin-top:4px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+.inventory-item,.shop-item,.shout-entry,.bestiary-entry{border-radius:10px;border:1px solid rgba(55,65,81,.95);background:radial-gradient(circle at top,rgba(15,23,42,.9),rgba(3,7,18,.98));padding:7px 8px;font-size:.8rem;display:flex;flex-direction:column;gap:3px;}
+.inventory-main-row,.shop-main-row,.bestiary-name-row{display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
+.inventory-subrow,.shop-subrow,.bestiary-meta-row{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:2px;}
+.inventory-name,.shop-name{font-weight:600}
+.inventory-meta,.shop-meta,.bestiary-meta{font-size:.75rem;color:var(--text-soft)}
+.inventory-buttons,.shop-buttons{display:flex;gap:4px;flex-wrap:wrap}
+.inventory-equip-btn,.inventory-sell-btn,.shop-buy-btn,.shout-equip-btn{border-radius:999px;border:1px solid rgba(212,175,55,.8);background:rgba(15,23,42,.9);color:#f9fafb;font-size:.72rem;padding:3px 8px;cursor:pointer;font-family:"Cinzel",serif;text-transform:uppercase;letter-spacing:.12em;}
+.inventory-sell-btn{border-color:rgba(52,211,153,.9)}
+.shop-buy-btn{border-color:rgba(96,165,250,.9)}
+.inventory-equip-btn:disabled,.inventory-sell-btn:disabled,.shop-buy-btn:disabled{opacity:.4;cursor:default;}
+.shout-name{font-family:"Cinzel",serif;text-transform:uppercase;letter-spacing:.15em;font-size:.78rem;}
+.shout-desc{color:var(--text-soft)}
+.shout-footer{display:flex;justify-content:space-between;align-items:center;margin-top:3px}
+.shout-tag{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(148,163,184,.95);}
+.shout-equip-btn.active{background:radial-gradient(circle at top,rgba(212,175,55,.55),rgba(15,23,42,.95));}
+.bestiary-entry.unknown{opacity:.6}
+.bestiary-name{font-family:"Cinzel",serif;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;}
+.bestiary-group-tag{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:var(--text-soft);}
+.bestiary-status{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;}
+.bestiary-status.seen{color:#facc15}
+.bestiary-status.defeated{color:#4ade80}
+.bestiary-status.unknown{color:#6b7280}
+.footer-hint{padding:6px 18px 12px;font-size:.75rem;color:var(--text-soft);border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;background:rgba(3,7,18,.98);}
+.footer-hint code{background:rgba(7,11,20,.98);border-radius:999px;padding:2px 7px;border:1px solid rgba(55,65,81,.9);font-size:.74rem;}
+.log-container::-webkit-scrollbar,.inventory-list::-webkit-scrollbar,.shop-list::-webkit-scrollbar,.bestiary-list::-webkit-scrollbar,.shout-list::-webkit-scrollbar{width:8px}
+.log-container::-webkit-scrollbar-track,.inventory-list::-webkit-scrollbar-track,.shop-list::-webkit-scrollbar-track,.bestiary-list::-webkit-scrollbar-track,.shout-list::-webkit-scrollbar-track{background:rgba(15,23,42,.9)}
+.log-container::-webkit-scrollbar-thumb,.inventory-list::-webkit-scrollbar-thumb,.shop-list::-webkit-scrollbar-thumb,.bestiary-list::-webkit-scrollbar-thumb,.shout-list::-webkit-scrollbar-thumb{background:rgba(148,163,184,.7);border-radius:999px;}
+.materials-text{font-size:.76rem;color:var(--text-soft);margin-top:2px;}
+</style>
+</head>
+<body>
+<div id="race-modal">
+  <div class="race-modal-inner">
+    <h2>Choose Your Race</h2>
+    <p>Select a race. Each one grants passive bonuses and a once-per-combat power.</p>
+
+    <div class="race-grid">
+      <button class="race-card" data-race="argonian">
+        <h3>Argonian</h3>
+        <div class="race-tagline">Marsh-born survivors, resistant and elusive.</div>
+        <div class="race-power"><strong>Histskin:</strong> Recover health rapidly in combat.</div>
+        <div class="race-mini">Resist disease • Water breathing • Thief / Mage leaning</div>
+      </button>
+
+      <button class="race-card" data-race="breton">
+        <h3>Breton</h3>
+        <div class="race-tagline">Spell-touched nobles with magic in their blood.</div>
+        <div class="race-power"><strong>Dragonskin:</strong> Draw in ambient magicka.</div>
+        <div class="race-mini">Magic resistance theme • Strong mage</div>
+      </button>
+
+      <button class="race-card" data-race="dunmer">
+        <h3>Dunmer</h3>
+        <div class="race-tagline">Dark Elves, scarred by fire and war.</div>
+        <div class="race-power"><strong>Ancestor’s Wrath:</strong> Burn nearby foes.</div>
+        <div class="race-mini">Resist fire theme • Mage / Thief</div>
+      </button>
+
+      <button class="race-card" data-race="altmer">
+        <h3>Altmer</h3>
+        <div class="race-tagline">High Elves, born to magic.</div>
+        <div class="race-power"><strong>Highborn:</strong> Magicka surges rapidly.</div>
+        <div class="race-mini">Extra magicka • Strongest mage</div>
+      </button>
+
+      <button class="race-card" data-race="imperial">
+        <h3>Imperial</h3>
+        <div class="race-tagline">Silver-tongued diplomats and disciplined soldiers.</div>
+        <div class="race-power"><strong>Voice of the Emperor:</strong> Calm foes and end fights.</div>
+        <div class="race-mini">More gold found • Balanced</div>
+      </button>
+
+      <button class="race-card" data-race="khajiit">
+        <h3>Khajiit</h3>
+        <div class="race-tagline">Feline nomads with silent paws and deadly claws.</div>
+        <div class="race-power"><strong>Claws:</strong> Tear into enemies with a brutal swipe.</div>
+        <div class="race-mini">Sneaky • High crit theme</div>
+      </button>
+
+      <button class="race-card" data-race="nord">
+        <h3>Nord</h3>
+        <div class="race-tagline">Steel-hearted warriors of the frozen north.</div>
+        <div class="race-power"><strong>Battle Cry:</strong> Send enemies fleeing.</div>
+        <div class="race-mini">Frontline fighter • Tough</div>
+      </button>
+
+      <button class="race-card" data-race="orsimer">
+        <h3>Orc</h3>
+        <div class="race-tagline">Orsimer smiths and berserkers.</div>
+        <div class="race-power"><strong>Berserker Rage:</strong> Brutal strike and shrug off pain.</div>
+        <div class="race-mini">Heavy armor / damage focus</div>
+      </button>
+
+      <button class="race-card" data-race="redguard">
+        <h3>Redguard</h3>
+        <div class="race-tagline">Hammerfell swordmasters with tireless stamina.</div>
+        <div class="race-power"><strong>Adrenaline Rush:</strong> Flood your body with stamina.</div>
+        <div class="race-mini">Weapon-focused • Stamina heavy</div>
+      </button>
+
+      <button class="race-card" data-race="bosmer">
+        <h3>Bosmer</h3>
+        <div class="race-tagline">Wood Elves, hunters of the deep forests.</div>
+        <div class="race-power"><strong>Command Animal:</strong> Call beasts to give you an opening.</div>
+        <div class="race-mini">Archery / agility • Escape tricks</div>
+      </button>
+    </div>
+
+    <!-- Character naming + summary -->
+    <div class="race-name-section">
+      <div class="race-name-header">Character setup</div>
+
+      <label for="character-name-input" class="race-name-label">
+        Name
+      </label>
+      <input
+        type="text"
+        id="character-name-input"
+        maxlength="20"
+        placeholder="e.g. Aela, Ragnar, Serana…"
+      />
+
+      <div id="race-summary" class="race-summary">
+        Choose a race to see its strengths.
+      </div>
+
+      <button id="confirm-race-btn" class="race-confirm-btn" disabled>
+        Begin your journey
+      </button>
+    </div>
+  </div>
+</div>
+<div class="frame">
+<header class="frame-header">
+  <div class="header-top"><div class="title">The Northern Path</div></div>
+  <p class="subtitle">A tiny, Skyrim-inspired HTML adventure. Cities are safe hubs with shops, temples, trainers — and your journey is saved to your browser.</p>
+  <div class="compass-bar">
+    <span>W</span><span>NW</span><span>SW</span>
+    <div class="compass-center" id="compass-location">Frozen North</div>
+    <span>NE</span><span>SE</span><span>E</span>
+  </div>
+</header>
+<main class="frame-body">
+  <section class="world-panel">
+    <div class="scene">
+      <div class="scene-location" id="scene-location">FROZEN NORTH • TIER I</div>
+      <div class="scene-title-row">
+        <div class="scene-title" id="scene-title">Snow-dusted valley</div>
+        <div class="scene-time" id="scene-time">Dawn</div>
+      </div>
+      <div class="scene-subtitle" id="scene-description">
+        You tighten your cloak as the mountain wind howls. Somewhere in these lands, dragons have begun to stir again.
+      </div>
+      <div class="scene-danger" id="scene-danger">Threat: ⚔ Low</div>
+      <div class="scene-tags">
+        <span class="scene-tag" id="scene-tag-1">Calm</span>
+        <span class="scene-tag" id="scene-tag-2">No active threat</span>
+      </div>
+      <div class="scene-row">
+        <span class="scene-label">City standing</span>
+        <span class="scene-value" id="scene-rep">Out in the wilds</span>
+      </div>
+
+    </div>
+    <div class="map-shell">
+      <div class="map-header">
+        <span class="label">Map of Skyrim</span>
+        <span class="region" id="map-region-label">Whiterun Hold</span>
+        <span class="hint">Click a city to fast travel (safe)</span>
+      </div>
+      <div class="map-container" id="map-container">
+        <div class="map-paper"></div>
+        <div class="map-locations">
+          <span class="whiterun" data-loc="whiterun">Whiterun</span>
+          <span class="solitude" data-loc="solitude">Solitude</span>
+          <span class="windhelm" data-loc="windhelm">Windhelm</span>
+          <span class="riften" data-loc="riften">Riften</span>
+          <span class="markarth" data-loc="markarth">Markarth</span>
+        </div>
+        <div class="map-marker" id="map-marker"><div class="map-marker-inner"></div></div>
+      </div>
+    </div>
+    <div class="log-shell">
+      <div class="log-header"><span>Event Log</span></div>
+      <div class="log-container"><ul id="log" class="log"></ul></div>
+    </div>
+  </section>
+  <aside class="side-panel">
+  <!-- TABS -->
+  <div class="hud-tabs">
+    <button class="hud-tab active" data-tab="status">Status</button>
+    <button class="hud-tab" data-tab="equipment">Equipment</button>
+    <button class="hud-tab" data-tab="inventory">Inventory</button>
+    <button class="hud-tab" data-tab="spells">Spells</button>
+    <button class="hud-tab" data-tab="shouts">Shouts</button>
+    <button class="hud-tab" data-tab="bestiary">Bestiary</button>
+  </div>
+
+<!-- STATUS PANEL -->
+  <div class="hud-panel active" id="panel-status">
+    <div class="stats">
+      <div class="stats-header">
+        <div>
+          <div class="stats-name" id="player-name">Dragonborn</div>
+          <div class="stats-race" id="player-race">Race: Nord</div>
+        </div>
+        <div class="stats-level" id="player-level">Level 1 • 0 / 25 XP</div>
+      </div>
+      <!-- stats body filled by JS -->
+
+      <div class="resource-row">
+        <div class="resource-label">Health</div>
+        <div class="bar-wrapper">
+          <div class="bar-fill health" id="health-bar"></div>
+          <div class="bar-text" id="health-text"></div>
+        </div>
+      </div>
+
+      <div class="resource-row">
+        <div class="resource-label">Stamina</div>
+        <div class="bar-wrapper">
+          <div class="bar-fill stamina" id="stamina-bar"></div>
+          <div class="bar-text" id="stamina-text"></div>
+        </div>
+      </div>
+
+      <div class="resource-row">
+        <div class="resource-label">Magicka</div>
+        <div class="bar-wrapper">
+          <div class="bar-fill magicka" id="magicka-bar"></div>
+          <div class="bar-text" id="magicka-text"></div>
+        </div>
+      </div>
+
+      <div class="resource-row">
+        <div class="resource-label">Companion</div>
+        <div class="bar-wrapper">
+          <div class="bar-fill health" id="companion-health-bar"></div>
+          <div class="bar-text" id="companion-health-text"></div>
+        </div>
+      </div>
+      <!-- NEW: reputation summary in the HUD -->
+      <div id="hud-rep-summary" class="hud-rep-row"></div> 
+      <div class="resource-row">
+        <div class="resource-label">Materials</div>
+        <div class="materials-text" id="materials-text">
+          Ore: Fe 0 • Cu 0 • Au 0 • Onyx 0 | Ingots: Fe 0 • Cu 0 • Au 0
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-pill"><span class="label">Gold</span><span class="value" id="gold-value">0</span></div>
+        <div class="stat-pill"><span class="label">Potions</span><span class="value" id="potions-value">H:0 S:0 M:0</span></div>
+        <div class="stat-pill"><span class="label">Zone</span><span class="value" id="zone-value">I</span></div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-pill"><span class="label">Weapon DMG</span><span class="value" id="stat-weapon-dmg">0</span></div>
+        <div class="stat-pill"><span class="label">Armor</span><span class="value" id="stat-armor">0</span></div>
+        <div class="stat-pill"><span class="label">Skill Pts</span><span class="value" id="skill-points-value">0</span></div>
+      </div>
+    </div> <!-- end .stats -->
+
+    <!-- Enemy preview -->
+    <div class="enemy-preview" id="enemy-preview">
+      <div class="enemy-header">
+        <span class="enemy-label">Current Foe</span>
+        <span class="enemy-name" id="enemy-name">None</span>
+      </div>
+      <div class="enemy-body">
+        <div class="bar-wrapper enemy-bar">
+          <div class="bar-fill health" id="enemy-health-bar"></div>
+          <div class="bar-text" id="enemy-health-text"></div>
+        </div>
+        <div class="enemy-meta" id="enemy-meta">No enemy engaged.</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <div>
+        <div class="actions-group-label">Exploration</div>
+        <div class="button-row">
+          <button class="action-btn primary" id="btn-explore">
+            Explore<span class="hotkey">E</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="actions-group-label">Combat</div>
+        <div class="button-row">
+          <button class="action-btn danger" id="btn-attack">Attack<span class="hotkey">A</span></button>
+          <button class="action-btn" id="btn-block">Block<span class="hotkey">B</span></button>
+          <button class="action-btn" id="btn-cast">Cast Spell<span class="hotkey">F</span></button>
+          <button class="action-btn" id="btn-potion">Potion<span class="hotkey">P</span></button>
+          <button class="action-btn" id="btn-shout">Shout<span class="hotkey">Q</span></button>
+          <button class="action-btn" id="btn-race-power">Power<span class="hotkey">R</span></button>
+          <button class="action-btn" id="btn-run">Escape<span class="hotkey">X</span></button>
+        </div>
+      </div>
+
+      <div>
+        <div class="actions-group-label">Potion Type</div>
+        <div class="button-row">
+          <button class="action-btn small potion-type-btn" data-potion="health">Health</button>
+          <button class="action-btn small potion-type-btn" data-potion="stamina">Stamina</button>
+          <button class="action-btn small potion-type-btn" data-potion="magicka">Magicka</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="actions-group-label">Skills (spend points)</div>
+        <div class="button-row">
+          <button class="action-btn small" id="btn-skill-warrior">Warrior</button>
+          <button class="action-btn small" id="btn-skill-mage">Mage</button>
+          <button class="action-btn small" id="btn-skill-thief">Thief</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="actions-group-label">Companion stance</div>
+        <div class="button-row">
+          <button class="action-btn small" id="btn-comp-stance-def">Defensive</button>
+          <button class="action-btn small" id="btn-comp-stance-bal">Balanced</button>
+          <button class="action-btn small" id="btn-comp-stance-agg">Aggressive</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="actions-group-label">City Services (in cities only)</div>
+<div class="button-row">
+  <button class="action-btn" id="btn-temple">Temple</button>
+  <button class="action-btn" id="btn-trainer">Trainer</button>
+  <button class="action-btn" id="btn-smelter">Smelter</button>
+  <button class="action-btn" id="btn-blacksmith">Blacksmith</button>
+  <button class="action-btn" id="btn-black-market">Black Market</button>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hud-panel" id="panel-equipment">
+  <div class="equip-panel-inner">
+
+    <!-- PLAYER GEAR SECTION -->
+    <div class="equip-section equip-section-player">
+      <div class="equip-header">
+        <span>Equipped Gear</span>
+      </div>
+      <div class="equip-grid">
+        <div class="equip-slot">
+          <div class="equip-label">Weapon</div>
+          <div class="equip-item" id="equip-weapon"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Shield</div>
+          <div class="equip-item" id="equip-shield"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Chest</div>
+          <div class="equip-item" id="equip-chest"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Boots</div>
+          <div class="equip-item" id="equip-boots"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Amulet</div>
+          <div class="equip-item" id="equip-amulet"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Ring</div>
+          <div class="equip-item" id="equip-ring"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPANION GEAR SECTION -->
+    <div class="equip-section equip-section-companion">
+      <div class="equip-header">
+        <span>Companion Gear</span>
+        <span id="companion-name-label" class="equip-subheader"></span>
+      </div>
+      <div class="equip-grid">
+        <div class="equip-slot">
+          <div class="equip-label">Weapon</div>
+          <div class="equip-item" id="equipc-weapon"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Shield</div>
+          <div class="equip-item" id="equipc-shield"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Chest</div>
+          <div class="equip-item" id="equipc-chest"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Boots</div>
+          <div class="equip-item" id="equipc-boots"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Amulet</div>
+          <div class="equip-item" id="equipc-amulet"></div>
+        </div>
+        <div class="equip-slot">
+          <div class="equip-label">Ring</div>
+          <div class="equip-item" id="equipc-ring"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <!-- INVENTORY PANEL -->
+  <div class="hud-panel" id="panel-inventory">
+    <div class="equip-panel-inner">
+      <div class="equip-header">Inventory (equip or sell in cities)</div>
+      <div class="inventory-list" id="inventory-list"></div>
+      <div class="equip-header">Shop (city only)</div>
+      <div class="shop-list" id="shop-list"></div>
+      <div class="blackmarket-banner" id="blackmarket-banner" style="display:none;">
+        <span>⚠ Riften Black Market – No Guards, No Refunds ⚠</span>
+      </div>
+    </div>
+  </div> <!-- end panel-inventory -->
+
+  <!-- SPELLS PANEL -->
+  <div class="hud-panel" id="panel-spells">
+    <div class="shout-panel-inner">
+      <div class="shout-header">Spells</div>
+      <div class="shout-equipped" id="spell-equipped-label">Equipped spell: none</div>
+      <ul class="shout-list" id="spell-list"></ul>
+    </div>
+  </div>
+
+  <!-- SHOUTS PANEL -->
+  <div class="hud-panel" id="panel-shouts">
+    <div class="shout-panel-inner">
+      <div class="shout-header">Dragon Shouts</div>
+      <div class="shout-equipped" id="shout-equipped-label">Equipped shout: none</div>
+      <ul class="shout-list" id="shout-list"></ul>
+    </div>
+  </div>
+
+  <!-- BESTIARY PANEL -->
+  <div class="hud-panel" id="panel-bestiary">
+    <div class="bestiary-panel-inner">
+      <div class="bestiary-header">
+        <span>Bestiary</span>
+        <span id="bestiary-progress"></span>
+      </div>
+      <div class="bestiary-list" id="bestiary-list"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER HINT -->
+  <div class="footer-hint">
+    <span>
+      Cities (Whiterun, Solitude, Windhelm, Riften, Markarth) are
+      <strong>safe</strong>. You can’t be attacked there and can use shops, temples,
+      trainers, smelters &amp; blacksmiths.
+    </span>
+    <span>
+      Game auto-saves to your browser. Keys:
+      <code>E</code> <code>A</code> <code>B</code> <code>F</code>
+      <code>P</code> <code>Q</code> <code>X</code>
+    </span>
+  </div>
+</aside>
+</main>
+</div>
+<script>
+(() => {
+"use strict";
+
+const K = "NorthernPathSaveV4";
+
+const SHOUTS = {
+  fus:{id:"fus",name:"Unrelenting Force",type:"Force",description:"A powerful blast of pure force that batters and staggers your foe."},
+  fire:{id:"fire",name:"Fire Breath",type:"Fire",description:"Exhale a jet of dragonfire that sears enemies."},
+  frost:{id:"frost",name:"Frost Breath",type:"Frost",description:"Blast your foe with freezing wind, weakening their attacks."},
+  clear:{id:"clear",name:"Clear Skies",type:"Weather",description:"Tear away hostile weather and clear blizzards from your path."},
+  ethereal:{id:"ethereal",name:"Become Ethereal",type:"Defense",description:"For a brief moment, your body becomes ghost-like and unharmed by blows."},
+  wstep:{id:"wstep",name:"Whirlwind Sprint",type:"Movement",description:"Hurl yourself forward in a blur to escape danger."},
+  aura:{id:"aura",name:"Aura Whisper",type:"Utility",description:"Reveal the life force of your foe, attuning you to them."},
+  animal:{id:"animal",name:"Animal Allegiance",type:"Animal",description:"Call beasts of the wild to harry your enemy and aid your ally."},
+  disarm:{id:"disarm",name:"Disarm",type:"Control",description:"Rip weapons from your foe's grasp, leaving them scrambling."},
+  mark:{id:"mark",name:"Marked for Death",type:"Curse",description:"Etch a deathly mark upon your foe, tearing away their strength."},
+  slow:{id:"slow",name:"Slow Time",type:"Time",description:"To you, the world nearly stops as you move freely."},
+  storm:{id:"storm",name:"Storm Call",type:"Storm",description:"Summon a raging thunderstorm to strike your enemy."},
+  throw:{id:"throw",name:"Throw Voice",type:"Trick",description:"Project your voice elsewhere, distracting foes."}
+};
+
+const SHOUT_WORDS = {
+  fus:   ["Fus", "Ro", "Dah"],                 // Unrelenting Force
+  fire:  ["Yol", "Toor", "Shul"],              // Fire Breath
+  frost: ["Fo", "Krah", "Diin"],               // Frost Breath
+  clear: ["Lok", "Vah", "Koor"],               // Clear Skies
+  ethereal: ["Feim", "Zii", "Gron"],           // Become Ethereal
+  wstep: ["Wuld", "Nah", "Kest"],              // Whirlwind Sprint
+  aura:  ["Laas", "Yah", "Nir"],               // Aura Whisper
+  animal:["Raan", "Mir", "Tah"],               // Animal Allegiance
+  disarm:["Zun", "Haal", "Viik"],              // Disarm
+  mark: ["Krii", "Lun", "Aus"],                // Marked for Death
+  slow: ["Tiid", "Klo", "Ul"],                 // Slow Time
+  storm:["Strun", "Bah", "Qo"],                // Storm Call
+  throw:["Zul", "Mey", "Gut"]                  // Throw Voice
+}; 
+
+// Pretty “FUS RO DAH!” line for combat log
+function shoutWordsLine(shoutId, level){
+  const words = SHOUT_WORDS[shoutId] || [];
+  if (!words.length) return "";
+  const slice = words.slice(0, level);
+  return slice.join(" ") + "!";
+}
+
+// Progress: Fus → Fus Ro → Fus Ro Dah
+function shoutProgressLine(shoutId, level){
+  const words = SHOUT_WORDS[shoutId] || [];
+  if (!words.length) return "";
+  const parts = [];
+  for (let i=1;i<=level;i++){
+    parts.push(words.slice(0,i).join(" "));
+  }
+  return parts.join(" → ");
+}
+
+// All shouts that can be learned from cave bosses
+const CAVE_SHOUT_POOL = [
+  "fus","fire","frost","clear","ethereal",
+  "wstep","aura","animal","disarm",
+  "mark","slow","storm","throw"
+];
+
+// Safely unlock a specific shout and log the word-wall flavour
+
+function unlockShout(shoutId, sourceName){
+  const p = STATE.player || (STATE.player = {});
+  const sh = p.shouts || (p.shouts = { known:[], levels:{}, equipped:null });
+
+  if (!Array.isArray(sh.known)) sh.known = [];
+  if (!sh.levels) sh.levels = {};
+
+  if (!sh.known.includes(shoutId)) {
+    // First word is free
+    sh.known.push(shoutId);
+    sh.levels[shoutId] = 1;
+  } else {
+    // Additional words cost 1 dragon soul
+    if (p.dragonSouls <= 0){
+      logMsg(
+        `You feel the power, but lack a <strong>Dragon Soul</strong> to unlock the next word.`,
+        "system"
+      );
+      return;
+    }
+    p.dragonSouls--;
+    sh.levels[shoutId] = Math.min(3, (sh.levels[shoutId] || 1) + 1);
+  }
+
+  const level = sh.levels[shoutId];
+  const def = SHOUTS[shoutId];
+  const words = [""," (Second Word Learned)"," (Full Power)"];
+  const progress = shoutProgressLine(shoutId, level);
+  const progressHTML = progress
+    ? `<br><span class="shout-progress">${progress}</span>`
+    : "";
+
+  logMsg(
+    `At the glowing word wall in <strong>${sourceName}</strong>, you learn more of <strong>${def.name}</strong>${words[level-1]}.${progressHTML}`,
+    "system"
+  );
+
+  updateShouts();
+  saveGame();
+}
+
+const SPELLS = {
+  frostbolt:{id:"frostbolt",name:"Frostbolt",school:"Destruction",element:"Frost",minDamage:10,maxDamage:16,baseCost:12,description:"A shard of ice that pierces and chills a single foe."},
+  firebolt:{id:"firebolt",name:"Firebolt",school:"Destruction",element:"Fire",minDamage:11,maxDamage:18,baseCost:13,description:"A bolt of flame that scorches a single target."},
+  shockbolt:{id:"shockbolt",name:"Shockbolt",school:"Destruction",element:"Shock",minDamage:9,maxDamage:20,baseCost:14,description:"A crackling lance of lightning that jolts your enemy."}
+};
+
+const RACES = {
+  argonian:{id:"argonian",name:"Argonian"},
+  breton:{id:"breton",name:"Breton"},
+  dunmer:{id:"dunmer",name:"Dunmer"},
+  altmer:{id:"altmer",name:"Altmer"},
+  imperial:{id:"imperial",name:"Imperial"},
+  khajiit:{id:"khajiit",name:"Khajiit"},
+  nord:{id:"nord",name:"Nord"},
+  orsimer:{id:"orsimer",name:"Orc"},
+  redguard:{id:"redguard",name:"Redguard"},
+  bosmer:{id:"bosmer",name:"Bosmer"}
+};
+
+const RACE_TRAITS = {
+  argonian:{potionBonus:.1,escapeBonus:.05},
+  breton:{spellMult:.1},
+  dunmer:{spellMult:.08,weaponMult:.05},
+  altmer:{spellMult:.15},
+  imperial:{goldBonus:.1},
+  khajiit:{critBonus:.08,escapeBonus:.05},
+  nord:{weaponMult:.08},
+  orsimer:{weaponMult:.12},
+  redguard:{weaponMult:.1,escapeBonus:.03},
+  bosmer:{escapeBonus:.06,critBonus:.04}
+};
+
+const RARITY_ORDER = ["common","fine","superior","epic"];
+
+const RARITY_DMG = {common:1,fine:1.2,superior:1.45,epic:1.8};
+const RARITY_COST = {common:1,fine:1.15,superior:1.3,epic:1.5};
+
+const CITIES = {
+  whiterun:{id:"whiterun",name:"Whiterun",hold:"Whiterun Hold",x:0,y:0,zone:1},
+  solitude:{id:"solitude",name:"Solitude",hold:"Haafingar",x:-3,y:3,zone:2},
+  windhelm:{id:"windhelm",name:"Windhelm",hold:"Eastmarch",x:4,y:2,zone:2},
+  riften:{id:"riften",name:"Riften",hold:"The Rift",x:3,y:-3,zone:2},
+  markarth:{id:"markarth",name:"Markarth",hold:"The Reach",x:-4,y:-1,zone:2}
+};
+
+const R_LABEL = {common:"Common",fine:"Fine",superior:"Superior",epic:"Epic"};
+
+const AMULET_TRAITS = {
+  common:{name:"Minor Fortitude",key:"potionBonus",value:.1,desc:"+10% potion effectiveness."},
+  fine:{name:"Blessing of Renewal",key:"potionBonus",value:.2,desc:"+20% potion effectiveness."},
+  superior:{name:"Mageblood",key:"spellMult",value:.15,desc:"+15% spell damage."},
+  epic:{name:"Archmage's Oath",key:"spellMult",value:.25,extra:{potionBonus:.2},desc:"+25% spell damage & +20% potion effectiveness."}
+};
+
+const RING_TRAITS = {
+  common:{name:"Scout's Band",key:"escapeBonus",value:.05,desc:"+5% escape chance."},
+  fine:{name:"Warrior's Band",key:"weaponMult",value:.1,desc:"+10% weapon damage."},
+  superior:{name:"Champion's Sigil",key:"weaponMult",value:.18,extra:{critBonus:.05},desc:"+18% weapon damage & +5% crit chance."},
+  epic:{name:"Dragon's Circle",key:"weaponMult",value:.25,extra:{critBonus:.1,goldBonus:.15},desc:"+25% weapon damage, +10% crit chance, +15% gold found."}
+};
+
+const SLOTS = ["weapon","shield","chest","boots","amulet","ring"];
+const WEAPON_TYPES = {
+  dagger:{
+    id:"dagger",
+    label:"Dagger",
+    class:"One-Handed",
+    damageMult:0.7,
+    critBonus:0.15,
+    staminaCost:4
+  },
+  sword:{
+    id:"sword",
+    label:"Sword",
+    class:"One-Handed",
+    damageMult:1.0,
+    critBonus:0.05,
+    staminaCost:6
+  },
+  mace:{
+    id:"mace",
+    label:"Mace",
+    class:"One-Handed",
+    damageMult:1.05,
+    staminaCost:6,
+    armorPierce:true // extra damage vs tougher foes
+  },
+  war_axe:{
+    id:"war_axe",
+    label:"War Axe",
+    class:"One-Handed",
+    damageMult:1.0,
+    staminaCost:6,
+    bleedChance:0.5,
+    bleedMin:4,
+    bleedMax:8
+  },
+  battleaxe:{
+    id:"battleaxe",
+    label:"Battleaxe",
+    class:"Two-Handed",
+    damageMult:1.2,
+    staminaCost:8,
+    bleedChance:0.75,
+    bleedMin:6,
+    bleedMax:10
+  },
+  greatsword:{
+    id:"greatsword",
+    label:"Greatsword",
+    class:"Two-Handed",
+    damageMult:1.25,
+    staminaCost:8,
+    glanceChance:0.15,
+    glanceMult:0.7 // big but sometimes glancing
+  },
+  warhammer:{
+    id:"warhammer",
+    label:"Warhammer",
+    class:"Two-Handed",
+    damageMult:1.35,
+    staminaCost:9,
+    staggerChance:0.35 // can skip enemy turn
+  },
+  bow:{
+    id:"bow",
+    label:"Bow",
+    class:"Ranged",
+    damageMult:0.95,
+    staminaCost:5,
+    skipCounterChance:0.3 // often no retaliation
+  },
+  crossbow:{
+    id:"crossbow",
+    label:"Crossbow",
+    class:"Ranged",
+    damageMult:1.15,
+    staminaCost:7,
+    skipCounterChance:0.2 // strong but heavier
+  }
+};
+
+const WEAPON_TYPE_IDS = Object.keys(WEAPON_TYPES);
+
+// --- Shield archetypes: light / heavy / unique ---
+const SHIELD_TYPES = {
+  light:  { id:"light",  label:"Light Shield",  blockBonus:0.16, staminaCost:2 },
+  heavy:  { id:"heavy",  label:"Heavy Shield",  blockBonus:0.30, staminaCost:4 },
+  unique: { id:"unique", label:"Unique Shield", blockBonus:0.36, staminaCost:3 } // uniques can also get extra traits
+};
+
+const SHIELD_TYPE_IDS = Object.keys(SHIELD_TYPES);
+
+const SHIELD_NAMES = {
+  light: {
+    common:   "Rough Iron Buckler",
+    fine:     "Reinforced Leather Shield",
+    superior: "Elven Buckler",
+    epic:     "Whisperwind Guard"
+  },
+  heavy: {
+    common:   "Iron Tower Shield",
+    fine:     "Steel Greatshield",
+    superior: "Orcish Warshield",
+    epic:     "Nordic Bulwark"
+  },
+  unique: {
+    common:   "Wanderer’s Bulwark",
+    fine:     "Aegis of the Road",
+    superior: "Guardian of the North",
+    epic:     "Dragonborn Aegis"
+  }
+};
+
+
+
+const RECIPES = [
+  {id:"iron_sword",name:"Iron Sword",slot:"weapon",weaponType:"sword",rarity:"common",damage:10,value:40,cost:{ironIngot:2}},
+  {id:"iron_cuirass",name:"Iron Cuirass",slot:"chest",rarity:"common",armor:10,value:55,cost:{ironIngot:3}},
+  {id:"copper_ring",name:"Copper Ring",slot:"ring",rarity:"fine",armor:3,value:70,cost:{copperIngot:2}},
+  {id:"gold_onyx_amulet",name:"Gold-Onyx Amulet",slot:"amulet",rarity:"epic",armor:6,value:160,cost:{goldIngot:1,onyx:1}}
+];
+
+const CAVES = [
+  // TIER 1
+  {
+    id:"bleak_falls",
+    name:"Bleak Falls Barrow",
+    tier:1,
+    zone:1,
+    ore:{iron:.7,copper:.2,gold:.1,onyx:0},
+    blurb:"A crumbling Nordic tomb overlooking the valley. Draughts whisper through ancient stone halls.",
+    tag2:"Iron-rich, undead prowl",
+    bossId:"dragon_priest",     // existing enemy id
+    bossChance:0.25             // 25% chance your encounter is the boss
+  },
+  {
+    id:"embershard",
+    name:"Embershard Mine",
+    tier:1,
+    zone:1,
+    ore:{iron:.85,copper:.1,gold:.05,onyx:0},
+    blurb:"An abandoned iron mine choked with smoke and fallen beams.",
+    tag2:"Bandits & iron ore"
+    // no fixed boss, just good early loot
+  },
+
+  // TIER 2
+  {
+    id:"frostmere",
+    name:"Frostmere Crypt",
+    tier:2,
+    zone:2,
+    ore:{iron:.3,copper:.4,gold:.25,onyx:.05},
+    blurb:"An ice-choked crypt where restless dead and bandits clash in the dark.",
+    tag2:"Copper & gold veins",
+    bossId:"ancient_vampire",   // existing enemy id
+    bossChance:0.25
+  },
+  {
+    id:"lost_echo",
+    name:"Lost Echo Cavern",
+    tier:2,
+    zone:2,
+    ore:{iron:.25,copper:.35,gold:.3,onyx:.1},
+    blurb:"Echoes of distant chanting haunt this flooded cavern of broken Nordic ruins.",
+    tag2:"Undead & hidden veins",
+    bossId:"draugr_overlord",   // existing enemy id
+    bossChance:0.22
+  },
+
+  // TIER 3
+  {
+    id:"blackreach_fissure",
+    name:"Blackreach Fissure",
+    tier:3,
+    zone:3,
+    ore:{iron:.1,copper:.2,gold:.3,onyx:.4},
+    blurb:"A hidden fissure dropping down toward Blackreach, lit by faint blue fungus.",
+    tag2:"Onyx & rare ores",
+    bossId:"ebony_warrior",     // existing super-boss
+    bossChance:0.16
+  },
+  {
+    id:"deep_dwemer",
+    name:"Deep Dwemer Vault",
+    tier:3,
+    zone:3,
+    ore:{iron:.05,copper:.2,gold:.35,onyx:.4},
+    blurb:"Ancient Dwemer vaults sealed behind massive gears, humming with forgotten power.",
+    tag2:"Dwemer constructs & onyx",
+    bossId:"centurion",         // existing enemy id
+    bossChance:0.28
+  }
+];
+
+const CAVE_BY_ID = {};
+CAVES.forEach(c=>CAVE_BY_ID[c.id]=c);
+
+const randInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const xpForLevel=l=>Math.floor(25*Math.pow(1.6,l-1));
+const totalPots=p=>p.health+p.stamina+p.magicka;
+const qDef=()=>({u:{p:0,t:3,c:false},e:{city:"solitude",c:false}});
+
+const rarityRank=r=>{const i=RARITY_ORDER.indexOf(r);return i<0?0:i};
+
+function getTraitEffects(){
+  const out={weaponMult:1,spellMult:1,escapeBonus:0,goldBonus:0,potionBonus:0,critBonus:0};
+  const eq=STATE.player.equipment||{};
+  function applyKey(k,v){
+    if(k==="weaponMult"||k==="spellMult")out[k]*=1+v;
+    else out[k]+=v;
+  }
+  function apply(item,table){
+    if(!item||!table)return;
+    const r=item.rarity||"common",def=table[r];if(!def)return;
+    if(def.key!=null&&def.value!=null)applyKey(def.key,def.value);
+    if(def.extra){for(const k in def.extra)applyKey(k,def.extra[k]);}
+  }
+  apply(eq.amulet,AMULET_TRAITS);
+  apply(eq.ring,RING_TRAITS);
+  const raceId=STATE.player.raceId;
+  const rTrait=RACE_TRAITS[raceId];
+  if(rTrait){
+    for(const k in rTrait)applyKey(k,rTrait[k]);
+  }
+  return out;
+}
+
+function traitSummary(slot,r){
+  const tbl=slot==="amulet"?AMULET_TRAITS:slot==="ring"?RING_TRAITS:null;
+  if(!tbl)return null;const t=tbl[r];if(!t)return null;
+  return `${t.name}: ${t.desc}`;
+}
+
+function rollRarity(){let r=Math.random()*100;return r<55?"common":r<80?"fine":r<95?"superior":"epic"}
+
+// forcedRarity is optional; if passed, we always use that (e.g. "epic")
+function makeLoot(zone, forcedRarity){
+  const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
+  const rar  = forcedRarity || rollRarity();
+
+  const N = {
+    weapon:{
+      common:"Rusty Iron Weapon",
+      fine:"Honed Steel Weapon",
+      superior:"Nordic Enchanted Weapon",
+      epic:"Dragonbone Relic"
+    },
+    chest:{
+      common:"Traveler's Leathers",
+      fine:"Reinforced Iron Armor",
+      superior:"Scaled Mail of the North",
+      epic:"Ancient Dragonplate Armor"
+    },
+    boots:{
+      common:"Worn Fur Boots",
+      fine:"Hardened Leather Boots",
+      superior:"Silent Hunter's Boots",
+      epic:"Stormstride Sabatons"
+    },
+    amulet:{
+      common:"Tarnished Amulet",
+      fine:"Amulet of Stamina",
+      superior:"Amulet of the Frostborn",
+      epic:"Amulet of the Dragonblood"
+    },
+    ring:{
+      common:"Bent Silver Ring",
+      fine:"Ring of Minor Magicka",
+      superior:"Ring of the Battlemage",
+      epic:"Ring of the Dovahkiin"
+    },
+    // fallback shield names (overridden by SHIELD_NAMES when available)
+    shield:{
+      common:"Weathered Shield",
+      fine:"Sturdy Shield",
+      superior:"Nordic Shield",
+      epic:"Ancient Dragon Shield"
+    }
+  };
+
+  const B = {
+    weapon:{common:8,fine:11,superior:15,epic:20},
+    chest:{common:6,fine:9,superior:13,epic:18},
+    boots:{common:3,fine:5,superior:7,epic:10},
+    amulet:{common:2,fine:4,superior:6,epic:9},
+    ring:{common:2,fine:4,superior:6,epic:9},
+    shield:{common:6,fine:10,superior:14,epic:18} // base armor for shields
+  };
+
+  const V = {
+    weapon:{common:25,fine:60,superior:120,epic:260},
+    chest:{common:18,fine:45,superior:90,epic:200},
+    boots:{common:10,fine:26,superior:55,epic:110},
+    amulet:{common:14,fine:32,superior:70,epic:150},
+    ring:{common:14,fine:32,superior:70,epic:150},
+    shield:{common:18,fine:40,superior:90,epic:190}
+  };
+
+  // --- WEAPONS (unchanged from your logic, just moved inside) ---
+  if (slot === "weapon") {
+    const typeId = WEAPON_TYPE_IDS[randInt(0, WEAPON_TYPE_IDS.length - 1)];
+    const wt = WEAPON_TYPES[typeId] || WEAPON_TYPES.sword;
+
+    const weaponNames = {
+      dagger:{common:"Rusty Iron Dagger",fine:"Steel Dagger",superior:"Glass Dagger",epic:"Daedric Dagger"},
+      sword:{common:"Rusty Iron Sword",fine:"Honed Steel Sword",superior:"Nord Hero Greatsword",epic:"Dragonbone Sword"},
+      mace:{common:"Cracked Iron Mace",fine:"Steel Mace",superior:"Orcish Mace",epic:"Daedric Mace"},
+      war_axe:{common:"Notched Iron War Axe",fine:"Steel War Axe",superior:"Nordic War Axe",epic:"Dragonbone War Axe"},
+      battleaxe:{common:"Heavy Iron Battleaxe",fine:"Steel Battleaxe",superior:"Orcish Battleaxe",epic:"Daedric Battleaxe"},
+      greatsword:{common:"Worn Iron Greatsword",fine:"Steel Greatsword",superior:"Nordic Greatsword",epic:"Dragonbone Greatsword"},
+      warhammer:{common:"Dented Iron Warhammer",fine:"Steel Warhammer",superior:"Orcish Warhammer",epic:"Daedric Warhammer"},
+      bow:{common:"Hunting Bow",fine:"Nordic Bow",superior:"Glass Bow",epic:"Daedric Bow"},
+      crossbow:{common:"Basic Crossbow",fine:"Dwarven Crossbow",superior:"Enhanced Crossbow",epic:"Dragonbone Crossbow"}
+    };
+
+    const nameTable = weaponNames[typeId] || weaponNames.sword;
+    const name = nameTable[rar] || N.weapon[rar];
+
+    const baseStat = B.weapon[rar];
+    const dmg = Math.round((baseStat + (zone - 1) * 4) * (wt.damageMult || 1));
+
+    const baseVal = V.weapon[rar];
+    const value = Math.round(baseVal * (1 + 0.4 * (zone - 1)));
+
+    return {
+      slot:"weapon",
+      rarity:rar,
+      name,
+      damage:dmg,
+      armor:null,
+      value,
+      weaponType:typeId
+    };
+  }
+
+  // --- SHIELDS: random type, all zones ---
+  if (slot === "shield") {
+    // type choice is PURELY random – not tied to zone
+    let kind;
+
+    // epic shields have a decent chance to be "unique"
+    if (rar === "epic" && Math.random() < 0.5) {
+      kind = "unique";
+    } else {
+      // 50/50 light vs heavy for everything else
+      kind = Math.random() < 0.5 ? "light" : "heavy";
+    }
+
+    const st = SHIELD_TYPES[kind] || SHIELD_TYPES.light;
+
+    // name table per shield type, falling back to generic N.shield if needed
+    const nameTable = SHIELD_NAMES[kind] || SHIELD_NAMES.light || N.shield;
+    const baseName = (nameTable && nameTable[rar]) || N.shield[rar];
+
+    const baseArmor = B.shield[rar];
+    const armor = baseArmor + (zone - 1) * 4;
+
+    const baseVal = V.shield[rar];
+    const value = Math.round(baseVal * (1 + 0.4 * (zone - 1)));
+
+    // base shield item
+    const item = {
+      slot:"shield",
+      rarity:rar,
+      name:baseName,
+      damage:null,
+      armor,
+      value,
+      shieldType:st.id,          // "light" | "heavy" | "unique"
+      blockBonus:st.blockBonus,  // used when blocking
+      staminaCost:st.staminaCost // stamina cost on block
+    };
+
+    // epic uniques can roll special traits (completely random, all zones)
+    if (kind === "unique" && rar === "epic") {
+      const special = {};
+
+      // small reflect
+      if (Math.random() < 0.6) {
+        special.reflectDamage = randInt(4, 10); // max reflect per block
+      }
+
+      // chance to fully negate
+      if (Math.random() < 0.4) {
+        special.negateChance = 0.15 + Math.random() * 0.15; // 15–30%
+      }
+
+      // occasional frost resistance
+      if (Math.random() < 0.3) {
+        special.elementResist = { frost: 0.2 }; // 20% frost resist hook if you ever want to use it
+      }
+
+      item.special = special;
+    }
+
+    return item;
+  }
+
+  // --- Everything else (armor / trinkets) ---
+  const name = N[slot][rar];
+  const baseStat = B[slot][rar];
+  const stat = baseStat + (zone - 1) * 4;
+  const baseVal = V[slot][rar];
+  const value = Math.round(baseVal * (1 + 0.4 * (zone - 1)));
+
+  const it = {
+    slot,
+    rarity:rar,
+    name,
+    damage:null,
+    armor:null,
+    value
+  };
+
+  if (slot === "weapon") it.damage = stat;
+  else it.armor = stat;
+
+  return it;
+}
+
+window.spawnTestShield = function(){
+  const shield = {
+    slot: "shield",
+    rarity: "epic",
+    name: "DEV TEST SHIELD",
+    armor: 30,
+    value: 999,
+    shieldType: "unique",
+    blockBonus: 0.45,
+    staminaCost: 4,
+    special: {
+      reflectDamage: randInt(5, 12),
+      negateChance: 0.25
+    }
+  };
+
+  STATE.inventory.push(shield);
+
+  logMsg(
+    `Developer: spawned <strong>${shield.name}</strong> (reflect ${shield.special.reflectDamage}, negate ${Math.round(shield.special.negateChance * 100)}%)`,
+    "system"
+  );
+
+  fullUpdate();
+};
+
+const STATE = {
+  player:{
+    name:"Dragonborn",
+    maxHealth:100,health:100,maxStamina:60,stamina:60,maxMagicka:50,magicka:50,
+    level:1,xp:0,xpToNext:25,gold:0,
+    potions:{health:3,stamina:1,magicka:0},selectedPotion:"health",zone:1,
+    equipment:{
+      weapon:{slot:"weapon",name:"Rusty Iron Sword",rarity:"common",damage:8,value:20,weaponType:"sword"},
+      chest:{slot:"chest",name:"Traveler's Leathers",rarity:"common",armor:6,value:16},
+      boots:{slot:"boots",name:"Worn Fur Boots",rarity:"common",armor:3,value:10},
+      amulet:null,ring:null
+    },
+    shouts:{known:["fus","wstep","frost"], levels:{fus:1,wstep:1,frost:1}, equipped:"fus"},
+    spells:{known:[{id:"frostbolt",rarity:"common"}],equipped:"frostbolt"},
+    skills:{warrior:0,mage:0,thief:0,points:0},
+    raceId:null,
+    shoutCooldown: 0,
+    dragonSouls: 0,
+    tempRestedBuff: 0, // counts down fights with cheaper stamina costs
+  },
+
+  reputation:{
+    whiterun:0,
+    solitude:0,
+    windhelm:0,
+    riften:0,
+    markarth:0
+  },
+
+  world:{x:0,y:0,timeOfDayIndex:0,currentCity:"whiterun",inCave:false,caveId:null,lastCityEvent:null},
+  combat:{inCombat:false,enemy:null,playerBlocking:false,racialUsed:false},
+  inventory:[],
+
+  // 👇 shop object now correctly contains isBlackMarket
+  shop:{ items:[], isBlackMarket:false },
+
+  bestiary:{seen:{},defeated:{}},
+  quests:qDef(),
+  resources:{ironOre:0,copperOre:0,goldOre:0,onyx:0,ironIngot:0,copperIngot:0,goldIngot:0}
+};
+
+// --- COMPANIONS ---
+// Single active companion for now.
+if (!STATE.companions) {
+  STATE.companions = [
+    {
+      id: "lydia",
+      name: "Lydia",
+      baseMaxHealth: 80,
+      maxHealth: 80,
+      health: 80,
+      stance: "balanced",
+      equipment: {
+        weapon: {
+          slot: "weapon",
+          name: "Steel Sword",
+          rarity: "common",
+          damage: 9,
+          value: 25,
+          weaponType: "sword"
+        },
+        shield: null,
+        chest: null,
+        boots: null,
+        amulet: null,
+        ring: null
+      }
+    }
+  ];
+}
+
+// add this RIGHT AFTER the STATE object:
+let pendingRaceId = null;
+
+const TIMES=["Dawn","Midday","Dusk","Midnight"];
+
+const ENEMIES=[ /* unchanged enemy data from your file */ 
+{id:"draugr",name:"Draugr",group:"Undead",tier:1,maxHealth:40,minDamage:5,maxDamage:9,xp:16,gold:[4,10],lootQuality:1,lootNote:"Ancient Nordic weapons"},
+{id:"draugr_overlord",name:"Draugr Death Overlord",group:"Undead",tier:3,maxHealth:120,minDamage:15,maxDamage:24,xp:60,gold:[30,70],lootQuality:2,lootNote:"powerful enchanted axes"},
+{id:"vampire",name:"Vampire",group:"Undead",tier:2,maxHealth:65,minDamage:8,maxDamage:14,xp:26,gold:[8,18],lootQuality:1.2,lootNote:"ring and amulet jewelry"},
+{id:"ancient_vampire",name:"Ancient Vampire",group:"Undead",tier:3,maxHealth:95,minDamage:11,maxDamage:18,xp:42,gold:[15,35],lootQuality:1.5,lootNote:"magicka gear"},
+{id:"ghost",name:"Ghost",group:"Undead",tier:1,maxHealth:32,minDamage:4,maxDamage:8,xp:14,gold:[3,9],lootQuality:.9,lootNote:"lightweight gear"},
+{id:"corrupted_shade",name:"Corrupted Shade",group:"Undead",tier:2,maxHealth:70,minDamage:9,maxDamage:15,xp:28,gold:[8,16],lootQuality:1.3,lootNote:"enchanted rings"},
+{id:"skeleton",name:"Skeleton",group:"Undead",tier:1,maxHealth:30,minDamage:4,maxDamage:7,xp:10,gold:[2,8],lootQuality:.8,lootNote:"rusted weapons"},
+{id:"dragon_priest",name:"Dragon Priest",group:"Undead",tier:3,maxHealth:140,minDamage:16,maxDamage:24,xp:70,gold:[40,90],lootQuality:2.3,lootNote:"powerful masks and staves"},
+{id:"boneman",name:"Boneman",group:"Undead",tier:2,maxHealth:55,minDamage:7,maxDamage:12,xp:22,gold:[6,14],lootQuality:1.1,lootNote:"bows and light armor"},
+{id:"wrathman",name:"Wrathman",group:"Undead",tier:3,maxHealth:115,minDamage:14,maxDamage:21,xp:52,gold:[20,45],lootQuality:1.7,lootNote:"heavy spectral armor"},
+{id:"dragon",
+ name:"Dragon",
+ group:"Dragon",
+ type:"Dragon",
+ element:"fire",
+ tier:3,
+ maxHealth:160,
+ minDamage:18,
+ maxDamage:28,
+ xp:80,
+ gold:[60,120],
+ lootQuality:2.5,
+ lootNote:"dragonbone weapons"},
+{id:"frost_dragon",
+ name:"Frost Dragon",
+ group:"Dragon",
+ type:"Dragon",
+ element:"frost",
+ tier:3,
+ maxHealth:170,
+ minDamage:17,
+ maxDamage:26,
+ xp:85,
+ gold:[60,125],
+ lootQuality:2.6,
+ lootNote:"frosted dragonbone and icy scales"},
+{id:"elder_dragon",
+ name:"Elder Dragon",
+ group:"Dragon",
+ type:"Dragon",
+ element:"fire",
+ tier:3,
+ maxHealth:190,
+ minDamage:20,
+ maxDamage:30,
+ xp:95,
+ gold:[70,135],
+ lootQuality:2.8,
+ lootNote:"ancient dragonbone relics"},
+{id:"ancient_dragon",
+ name:"Ancient Dragon",
+ group:"Dragon",
+ type:"Dragon",
+ element:"fire",
+ tier:3,
+ maxHealth:220,
+ minDamage:22,
+ maxDamage:32,
+ xp:115,
+ gold:[80,150],
+ lootQuality:3.0,
+ boss:true,
+ lootNote:"legendary dragon hoards"},
+{id:"alduin",name:"Alduin",group:"Creature",tier:3,maxHealth:220,minDamage:22,maxDamage:32,xp:120,gold:[100,180],lootQuality:3,lootNote:"legendary dragon gear",boss:true},
+{id:"falmer",name:"Falmer",group:"Creature",tier:2,maxHealth:65,minDamage:9,maxDamage:15,xp:24,gold:[7,15],lootQuality:1.2,lootNote:"Falmer weapons"},
+{id:"falmer_warmonger",name:"Falmer Warmonger",group:"Creature",tier:3,maxHealth:110,minDamage:14,maxDamage:22,xp:48,gold:[14,32],lootQuality:1.8,lootNote:"heavy Falmer armor"},
+{id:"giant",name:"Giant",group:"Creature",tier:2,maxHealth:120,minDamage:18,maxDamage:26,xp:46,gold:[20,40],lootQuality:1.6,lootNote:"giant club and mammoth loot"},
+{id:"werewolf",name:"Werewolf",group:"Creature",tier:2,maxHealth:80,minDamage:11,maxDamage:18,xp:32,gold:[10,22],lootQuality:1.3,lootNote:"claw-scarred armor pieces"},
+{id:"spriggan",name:"Spriggan",group:"Creature",tier:2,maxHealth:70,minDamage:10,maxDamage:16,xp:28,gold:[8,18],lootQuality:1.3,lootNote:"nature-themed jewelry"},
+{id:"chaurus",name:"Chaurus",group:"Creature",tier:2,maxHealth:72,minDamage:9,maxDamage:16,xp:26,gold:[6,16],lootQuality:1.2,lootNote:"acid-scorched gear"},
+{id:"spider",name:"Frostbite Spider",group:"Creature",tier:1,maxHealth:28,minDamage:4,maxDamage:8,xp:11,gold:[2,8],lootQuality:.8,lootNote:"venom and light loot"},
+{id:"troll",name:"Troll",group:"Creature",tier:2,maxHealth:85,minDamage:10,maxDamage:17,xp:30,gold:[6,16],lootQuality:1.2,lootNote:"regeneration-themed gear"},
+{id:"bear",name:"Bear",group:"Creature",tier:1,maxHealth:55,minDamage:7,maxDamage:13,xp:18,gold:[3,11],lootQuality:1,lootNote:"fur-lined armor"},
+{id:"sabre_cat",name:"Sabre Cat",group:"Creature",tier:2,maxHealth:78,minDamage:10,maxDamage:17,xp:28,gold:[6,15],lootQuality:1.3,lootNote:"hunter's gear"},
+{id:"ice_wraith",name:"Ice Wraith",group:"Creature",tier:2,maxHealth:60,minDamage:9,maxDamage:15,xp:26,gold:[7,16],lootQuality:1.3,lootNote:"frost-enchanted weapons"},
+{id:"horker",name:"Horker",group:"Creature",tier:1,maxHealth:38,minDamage:3,maxDamage:7,xp:9,gold:[1,5],lootQuality:.7,lootNote:"simple gear"},
+{id:"mudcrab",name:"Mudcrab",group:"Creature",tier:1,maxHealth:20,minDamage:2,maxDamage:5,xp:6,gold:[1,4],lootQuality:.6,lootNote:"junk loot"},
+{id:"skeever",name:"Skeever",group:"Creature",tier:1,maxHealth:18,minDamage:2,maxDamage:5,xp:6,gold:[1,4],lootQuality:.6,lootNote:"diseased scraps"},
+{id:"hagraven",name:"Hagraven",group:"Creature",tier:3,maxHealth:105,minDamage:13,maxDamage:21,xp:48,gold:[18,40],lootQuality:2,lootNote:"dark magic gear"},
+{id:"wolf",name:"Wolf",group:"Creature",tier:1,maxHealth:26,minDamage:3,maxDamage:7,xp:9,gold:[1,5],lootQuality:.8,lootNote:"fur-trimmed light gear"},
+{id:"wisp",name:"Wisp",group:"Creature",tier:2,maxHealth:45,minDamage:8,maxDamage:13,xp:22,gold:[6,14],lootQuality:1.2,lootNote:"mystic rings"},
+{id:"wispmother",name:"Wispmother",group:"Creature",tier:3,maxHealth:95,minDamage:12,maxDamage:18,xp:44,gold:[16,34],lootQuality:2,lootNote:"frost mage gear"},
+{id:"slaughterfish",name:"Slaughterfish",group:"Creature",tier:1,maxHealth:24,minDamage:3,maxDamage:7,xp:8,gold:[1,4],lootQuality:.7,lootNote:"waterlogged gear"},
+{id:"dremora",name:"Dremora",group:"Daedra",tier:2,maxHealth:82,minDamage:11,maxDamage:18,xp:34,gold:[10,24],lootQuality:1.6,lootNote:"Daedric-themed gear"},
+{id:"flame_atronach",name:"Flame Atronach",group:"Daedra",tier:2,maxHealth:60,minDamage:10,maxDamage:16,xp:26,gold:[8,18],lootQuality:1.4,lootNote:"fire-enchanted items"},
+{id:"frost_atronach",name:"Frost Atronach",group:"Daedra",tier:2,maxHealth:90,minDamage:12,maxDamage:19,xp:32,gold:[9,20],lootQuality:1.4,lootNote:"frost-enchanted items"},
+{id:"storm_atronach",name:"Storm Atronach",group:"Daedra",tier:3,maxHealth:120,minDamage:16,maxDamage:24,xp:52,gold:[18,40],lootQuality:2,lootNote:"shock-enchanted weapons"},
+{id:"seeker",name:"Seeker",group:"Daedra",tier:3,maxHealth:110,minDamage:14,maxDamage:22,xp:50,gold:[16,38],lootQuality:1.9,lootNote:"forbidden tomes"},
+{id:"lurker",name:"Lurker",group:"Daedra",tier:3,maxHealth:140,minDamage:18,maxDamage:26,xp:60,gold:[22,48],lootQuality:2.2,lootNote:"tentacled armor"},
+{id:"golden_saint",name:"Golden Saint",group:"Daedra",tier:3,maxHealth:115,minDamage:15,maxDamage:23,xp:56,gold:[20,44],lootQuality:2.3,lootNote:"gilded armor"},
+{id:"bandit",name:"Bandit",group:"Humanoid",tier:1,maxHealth:40,minDamage:5,maxDamage:9,xp:16,gold:[4,12],lootQuality:1,lootNote:"cheap melee weapons"},
+{id:"bandit_chief",name:"Bandit Chief",group:"Humanoid",tier:2,maxHealth:80,minDamage:10,maxDamage:17,xp:32,gold:[12,26],lootQuality:1.5,lootNote:"better steel gear"},
+{id:"forsworn",name:"Forsworn",group:"Humanoid",tier:2,maxHealth:70,minDamage:9,maxDamage:15,xp:27,gold:[8,20],lootQuality:1.3,lootNote:"spiked armor"},
+{id:"briarheart",name:"Forsworn Briarheart",group:"Humanoid",tier:3,maxHealth:105,minDamage:14,maxDamage:22,xp:46,gold:[20,40],lootQuality:2,lootNote:"heart-enchanted gear"},
+{id:"thalmor",name:"Thalmor Justiciar",group:"Humanoid",tier:2,maxHealth:75,minDamage:10,maxDamage:17,xp:32,gold:[12,28],lootQuality:1.6,lootNote:"elven robes and armor"},
+{id:"conjurer",name:"Conjurer",group:"Humanoid",tier:2,maxHealth:60,minDamage:8,maxDamage:14,xp:26,gold:[10,22],lootQuality:1.5,lootNote:"conjuration robes"},
+{id:"necromancer",name:"Necromancer",group:"Humanoid",tier:2,maxHealth:58,minDamage:8,maxDamage:14,xp:26,gold:[9,20],lootQuality:1.4,lootNote:"necromantic gear"},
+{id:"cultist",name:"Cultist",group:"Humanoid",tier:2,maxHealth:62,minDamage:9,maxDamage:15,xp:28,gold:[8,22],lootQuality:1.4,lootNote:"mysterious masks"},
+{id:"penitus",name:"Penitus Oculatus Agent",group:"Humanoid",tier:3,maxHealth:98,minDamage:13,maxDamage:21,xp:44,gold:[18,40],lootQuality:2,lootNote:"elite imperial gear"},
+{id:"centurion",name:"Dwarven Centurion",group:"Dwarven Automaton",tier:3,maxHealth:150,minDamage:17,maxDamage:26,xp:58,gold:[24,48],lootQuality:2.2,lootNote:"dwemer heavy armor"},
+{id:"sphere",name:"Dwarven Sphere",group:"Dwarven Automaton",tier:2,maxHealth:80,minDamage:11,maxDamage:17,xp:30,gold:[10,22],lootQuality:1.5,lootNote:"dwemer crossbows"},
+{id:"spider_bot",name:"Dwarven Spider",group:"Dwarven Automaton",tier:1,maxHealth:32,minDamage:4,maxDamage:8,xp:14,gold:[4,10],lootQuality:1.1,lootNote:"dwemer scrap loot"},
+{id:"ballista",name:"Dwarven Ballista",group:"Dwarven Automaton",tier:3,maxHealth:120,minDamage:18,maxDamage:26,xp:54,gold:[20,42],lootQuality:2.1,lootNote:"dwemer ranged tech"},
+{id:"anomaly",name:"Magic Anomaly",group:"Other",tier:3,maxHealth:100,minDamage:13,maxDamage:21,xp:46,gold:[16,34],lootQuality:1.9,lootNote:"strange arcane loot"},
+{id:"hag",name:"Hag",group:"Other",tier:2,maxHealth:65,minDamage:9,maxDamage:15,xp:28,gold:[8,20],lootQuality:1.3,lootNote:"wicked alchemy"},
+{id:"ebony_warrior",name:"The Ebony Warrior",group:"Other",tier:3,maxHealth:200,minDamage:20,maxDamage:30,xp:120,gold:[80,150],lootQuality:3,boss:true,lootNote:"legendary ebony gear"}
+];
+
+const E_ZONE={1:ENEMIES.filter(e=>e.tier===1),2:ENEMIES.filter(e=>e.tier===2),3:ENEMIES.filter(e=>e.tier===3)};
+
+function regionName(x,y){if(y<-2)return"The Rift";if(y>2)return"Haafingar";if(x<-2)return"The Reach";if(x>2)return"Eastmarch";return"Whiterun Hold"}
+
+function cityDesc(id){
+  const c=CITIES[id];if(!c)return null;
+  return{
+    location:`${c.name.toUpperCase()} • SAFE CITY`,
+    title:`${c.name}, ${c.hold}`,
+    description:`Merchants call out their wares, and guards patrol the streets. Within ${c.name}’s walls, you are safe from attack.`,
+    tag1:"Safe",
+    tag2:"Shops & Services"
+  };
+}
+
+function regionDesc(x,y,z){
+  if(STATE.world.inCave&&STATE.world.caveId){
+    const c=CAVE_BY_ID[STATE.world.caveId];
+    if(c)return{
+      location:`${c.name.toUpperCase()} • CAVE TIER ${c.tier}`,
+      title:c.name,
+      description:c.blurb,
+      tag1:"Cave",
+      tag2:c.tag2
+    };
+  }
+  const d=Math.abs(x)+Math.abs(y);
+  if(z===3)return{
+    location:"HIGH PEAKS • TIER III",
+    title:"Throat of the World",
+    description:"The air thins as you climb. Ancient stones ring with the echo of distant wingbeats.",
+    tag1:"Dragon Lair",
+    tag2:"Deadly"
+  };
+  if(d<=1)return{
+    location:`VALLEY APPROACH • TIER ${z}`,
+    title:"Snow-dusted valley",
+    description:"Pines sway beneath a sky of cold blue steel. The path ahead is quiet, for now.",
+    tag1:"Calm",
+    tag2:"No active threat"
+  };
+  if(d<=3)return{
+    location:`FROZEN WILDS • TIER ${z}`,
+    title:"Wind-carved ridge",
+    description:"Shattered stone and ice crunch beneath your boots. Tracks crisscross the ridge — wolves, and worse.",
+    tag1:"Uneasy",
+    tag2:"High chance of ambush"
+  };
+  return{
+    location:`ANCIENT RUINS • TIER ${z}`,
+    title:"Forgotten barrow",
+    description:"Half-buried ruins jut from the snow like broken teeth. Old magic whispers just beyond hearing.",
+    tag1:"Haunted",
+    tag2:"Powerful foes"
+  };
+}
+
+const inCity=()=>!!STATE.world.currentCity&&!!CITIES[STATE.world.currentCity];
+
+function logMsg(msg,type="system"){
+  const log=document.getElementById("log");if(!log)return;
+  const li=document.createElement("li");
+  li.className=`log-entry log-${type}`;
+
+  // NEW: icon per log type
+  const icons={
+    system:"◆",
+    enemy:"⚔",
+    loot:"⛁",
+    event:"✧",
+    quest:"✦"
+  };
+  const icon=icons[type]||"•";
+
+  const tag=document.createElement("span");
+  tag.className="log-tag";
+  tag.textContent=`${icon} ${type.toUpperCase()}: `;
+
+  const body=document.createElement("span");
+  body.className="log-body";
+  body.innerHTML=msg;
+
+  li.append(tag,body);
+  log.prepend(li);
+
+  while(log.children.length>80)log.removeChild(log.lastChild);
+}
+
+const weaponDmg=()=>{
+  const w=STATE.player.equipment.weapon;
+  const base=(!w||w.damage==null)?6:w.damage;
+  const s=STATE.player.skills?.warrior||0;
+  const t=getTraitEffects();
+  const raw=base+2*s;
+  return Math.round(raw*(t.weaponMult||1));
+};
+
+const armorRating=()=>{
+  let t=0;["chest","boots","amulet","ring"].forEach(s=>{
+    const i=STATE.player.equipment[s];
+    if(i&&i.armor)t+=i.armor;
+  });
+  return t;
+};
+
+function saveGame(){
+  try{
+    localStorage.setItem(K,JSON.stringify({
+      player:STATE.player,
+      world:STATE.world,
+      inventory:STATE.inventory,
+      shop:STATE.shop,
+      bestiary:STATE.bestiary,
+      quests:STATE.quests,
+      companions:STATE.companions,
+      resources:STATE.resources
+    }));
+  }catch{}
+}
+
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(K);
+    if (!raw) return false;
+
+    const d = JSON.parse(raw);
+
+    if (d.player) STATE.player = d.player;
+    if (d.world) STATE.world = d.world;
+    if (d.inventory) STATE.inventory = d.inventory;
+    if (d.shop) STATE.shop = d.shop; else STATE.shop = { items: [] };
+    if (d.bestiary) STATE.bestiary = d.bestiary;
+    STATE.quests = d.quests || qDef();
+
+    // companions
+    if (d.companions) {
+      STATE.companions = d.companions;
+    } else if (!STATE.companions) {
+      STATE.companions = [];
+    }
+
+    // ensure at least one companion exists
+    if (!STATE.companions.length) {
+      STATE.companions.push({
+        id: "lydia",
+        name: "Lydia",
+        baseMaxHealth: 80,
+        maxHealth: 80,
+        health: 80,
+        stance: "balanced",
+        equipment: {
+          weapon: {
+            slot: "weapon",
+            name: "Steel Sword",
+            rarity: "common",
+            damage: 9,
+            value: 25,
+            weaponType: "sword"
+          },
+          shield: null,
+          chest: null,
+          boots: null,
+          amulet: null,
+          ring: null
+        }
+      });
+    }
+
+    // --- make sure sub-objects always exist on old saves ---
+    const p = STATE.player || (STATE.player = {});
+
+    if (!p.potions) p.potions = { health:0, stamina:0, magicka:0 };
+    if (!p.shouts)  p.shouts  = { known:["fus"], equipped:"fus" };
+    if (!p.spells)  p.spells  = { known:[{ id:"frostbolt", rarity:"common" }], equipped:"frostbolt" };
+    if (!p.skills)  p.skills  = { warrior:0, mage:0, thief:0, points:0 };
+
+// ensure shouts.levels exists and has at least level 1 for each known shout
+if (p.shouts) {
+  if (!p.shouts.levels) p.shouts.levels = {};
+  if (!Array.isArray(p.shouts.known)) p.shouts.known = [];
+  p.shouts.known.forEach(id => {
+    if (p.shouts.levels[id] == null) p.shouts.levels[id] = 1;
+    if (p.shoutCooldown == null) p.shoutCooldown = 0;
+    if (p.dragonSouls == null) p.dragonSouls = 0;
+  });
+}
+
+    // ensure equipment object & all slots (including new shield slot)
+    if (!p.equipment) p.equipment = {};
+    const eq = p.equipment;
+    if (!("weapon" in eq)) eq.weapon = null;
+    if (!("shield" in eq)) eq.shield = null;
+    if (!("chest" in eq))  eq.chest  = null;
+    if (!("boots" in eq))  eq.boots  = null;
+    if (!("amulet" in eq)) eq.amulet = null;
+    if (!("ring" in eq))   eq.ring   = null;
+
+    if (!STATE.world) STATE.world = { x:0, y:0, timeOfDayIndex:0, currentCity:null, inCave:false, caveId:null };
+    if (!STATE.world.currentCity) STATE.world.currentCity = null;
+    if (STATE.world.inCave == null) STATE.world.inCave = false;
+    if (STATE.world.caveId == null) STATE.world.caveId = null;
+
+    if (!STATE.shop.items) STATE.shop.items = [];
+    if (!STATE.bestiary) STATE.bestiary = { seen:{}, defeated:{} };
+    if (!STATE.quests) STATE.quests = qDef();
+
+    if (d.resources) STATE.resources = d.resources;
+    const rr = STATE.resources || {};
+    ["ironOre","copperOre","goldOre","onyx","ironIngot","copperIngot","goldIngot"].forEach(k => {
+      if (rr[k] == null) rr[k] = 0;
+    });
+    STATE.resources = rr;
+
+    STATE.combat = {
+  inCombat:false,
+  enemy:null,
+  playerBlocking:false,
+  racialUsed:false,
+  blockProfile:null
+};
+
+    return true;
+  } catch (e) {
+    console.error("loadGame error:", e);
+    return false;
+  }
+}
+
+function markSeen(id){if(!id)return;if(!STATE.bestiary)STATE.bestiary={seen:{},defeated:{}};STATE.bestiary.seen[id]=true}
+function markDefeated(id){if(!id)return;markSeen(id);STATE.bestiary.defeated[id]=true}
+
+function raceName(){
+  const r=RACES[STATE.player.raceId];
+  return r?r.name:"Nord";
+}
+
+function updateRaceUI(){
+  const el=document.getElementById("player-race");
+  if(el)el.textContent="Race: "+raceName();
+}
+
+function applyRaceBase(id){
+  const p=STATE.player;
+  const s=p.skills||(p.skills={warrior:0,mage:0,thief:0,points:0});
+  switch(id){
+    case "argonian":
+      s.thief=(s.thief||0)+1;
+      s.mage=(s.mage||0)+1;
+      break;
+    case "breton":
+      s.mage=(s.mage||0)+2;
+      break;
+    case "dunmer":
+      s.mage=(s.mage||0)+1;
+      s.thief=(s.thief||0)+1;
+      break;
+    case "altmer":
+      s.mage=(s.mage||0)+2;
+      p.maxMagicka+=30;
+      p.magicka=p.maxMagicka;
+      break;
+    case "imperial":
+      s.warrior=(s.warrior||0)+1;
+      s.mage=(s.mage||0)+1;
+      break;
+    case "khajiit":
+      s.thief=(s.thief||0)+2;
+      break;
+    case "nord":
+      s.warrior=(s.warrior||0)+2;
+      p.maxHealth+=10;
+      p.health=p.maxHealth;
+      break;
+    case "orsimer":
+      s.warrior=(s.warrior||0)+2;
+      break;
+    case "redguard":
+      s.warrior=(s.warrior||0)+2;
+      p.maxStamina+=10;
+      p.stamina=p.maxStamina;
+      break;
+    case "bosmer":
+      s.thief=(s.thief||0)+2;
+      break;
+  }
+  STATE.player.skills=s;
+}
+
+function chooseRace(id){
+  if (!RACES[id]) return;
+  pendingRaceId = id;
+
+  // Visually highlight selected race card
+  const modal = document.getElementById("race-modal");
+  if (modal) {
+    modal.querySelectorAll(".race-card").forEach(card => {
+      card.classList.toggle("selected", card.dataset.race === id);
+    });
+  }
+
+  // Refresh summary + button state
+  updateRaceSummary();
+  updateConfirmButtonState();
+}
+
+function updateRaceSummary(){
+  const summary = document.getElementById("race-summary");
+  if (!summary) return;
+
+  if (!pendingRaceId || !RACES[pendingRaceId]) {
+    summary.textContent = "Choose a race to see its strengths.";
+    return;
+  }
+
+  const race = RACES[pendingRaceId];
+  const traits = RACE_TRAITS[pendingRaceId] || {};
+  const parts = [];
+
+  if (traits.weaponMult) {
+    parts.push(`+${Math.round(traits.weaponMult * 100)}% weapon damage`);
+  }
+  if (traits.spellMult) {
+    parts.push(`+${Math.round(traits.spellMult * 100)}% spell damage`);
+  }
+  if (traits.escapeBonus) {
+    parts.push(`+${Math.round(traits.escapeBonus * 100)}% escape chance`);
+  }
+  if (traits.goldBonus) {
+    parts.push(`+${Math.round(traits.goldBonus * 100)}% gold found`);
+  }
+  if (traits.potionBonus) {
+    parts.push(`+${Math.round(traits.potionBonus * 100)}% potion effectiveness`);
+  }
+  if (traits.critBonus) {
+    parts.push(`+${Math.round(traits.critBonus * 100)}% critical hit chance`);
+  }
+
+  summary.innerHTML = `<strong>${race.name}</strong> — ${
+    parts.length ? parts.join(" • ") : "No special bonuses."
+  }`;
+}
+
+function updateConfirmButtonState(){
+  const btn = document.getElementById("confirm-race-btn");
+  if (!btn) return;
+
+  const input = document.getElementById("character-name-input");
+  const name = input ? input.value.trim() : "";
+
+  // Require a race; name is optional (will default to Dragonborn)
+  btn.disabled = !pendingRaceId || !RACES[pendingRaceId];
+}
+
+function confirmCharacter(){
+  if (!pendingRaceId || !RACES[pendingRaceId]) return;
+
+  const input = document.getElementById("character-name-input");
+  const rawName = input ? input.value.trim() : "";
+  const name = rawName || "Dragonborn";
+
+  // Save name to player + HUD
+  STATE.player.name = name;
+  const nameEl = document.getElementById("player-name");
+  if (nameEl) {
+    nameEl.textContent = STATE.player.name;
+  }
+
+  // Apply race + base bonuses
+  STATE.player.raceId = pendingRaceId;
+  applyRaceBase(pendingRaceId);
+  updateRaceUI();
+  closeRaceModal();
+
+  logMsg(
+    `You begin your journey as <strong>${STATE.player.name}</strong>, a <strong>${RACES[pendingRaceId].name}</strong>.`,
+    "system"
+  );
+
+  fullUpdate();
+}
+
+function updateBestiary() {
+  try {
+    const list = document.getElementById("bestiary-list");
+    const prog = document.getElementById("bestiary-progress");
+    if (!list || !prog) return;
+
+    list.innerHTML = "";
+
+    const seen = (STATE.bestiary && STATE.bestiary.seen) || {};
+    const defeated = (STATE.bestiary && STATE.bestiary.defeated) || {};
+    const total = ENEMIES.length;
+    const seenC = Object.keys(seen).length;
+    const defC = Object.keys(defeated).length;
+
+    prog.textContent = `Seen ${seenC}/${total} • Defeated ${defC}`;
+
+    ENEMIES.forEach(e => {
+      const isSeen = !!seen[e.id];
+      const isDef = !!defeated[e.id];
+
+      const box = document.createElement("div");
+      box.className = "bestiary-entry" + (isSeen ? "" : " unknown");
+
+      const nRow = document.createElement("div");
+      nRow.className = "bestiary-name-row";
+
+      const n = document.createElement("div");
+      n.className = "bestiary-name";
+      n.textContent = isSeen ? e.name : "?????";
+
+      const g = document.createElement("div");
+      g.className = "bestiary-group-tag";
+      g.textContent = e.group;
+
+      nRow.append(n, g);
+
+      const mRow = document.createElement("div");
+      mRow.className = "bestiary-meta-row";
+
+      const m = document.createElement("div");
+      m.className = "bestiary-meta";
+      m.textContent = isSeen
+        ? `Tier ${e.tier} • HP ${e.maxHealth} • DMG ${e.minDamage}-${e.maxDamage}`
+        : `Tier ${e.tier} • Stats unknown`;
+
+      const st = document.createElement("div");
+      st.className =
+        "bestiary-status " + (isDef ? "defeated" : isSeen ? "seen" : "unknown");
+      st.textContent = isDef ? "Defeated" : isSeen ? "Seen" : "Unknown";
+
+      mRow.append(m, st);
+      box.append(nRow, mRow);
+
+      if (e.lootNote && isSeen) {
+        const l = document.createElement("div");
+        l.className = "bestiary-meta";
+        l.textContent = `Known for: ${e.lootNote}`;
+        box.appendChild(l);
+      }
+
+      list.appendChild(box);
+    });
+  } catch (err) {
+    console.error("updateBestiary error", err);
+  }
+}
+
+function dangerInfo(x,y,z){
+  const id=nearestCity(x,y);let dist;
+  if(id){
+    const c=CITIES[id];dist=Math.abs(c.x-x)+Math.abs(c.y-y);
+  }else dist=Math.abs(x)+Math.abs(y);
+  if(z===1){
+    if(dist<=2)return{label:"Low",icons:"⚔"};
+    return{label:"Medium",icons:"⚔⚔"};
+  }
+  if(z===2){
+    if(dist<=1)return{label:"Medium",icons:"⚔⚔"};
+    if(dist<=3)return{label:"High",icons:"⚔⚔⚔"};
+    return{label:"Deadly",icons:"⚔⚔⚔"};
+  }
+  if(dist<=2)return{label:"High",icons:"⚔⚔⚔"};
+  return{label:"Deadly",icons:"⚔⚔⚔"};
+}
+
+function updateResourcesUI(){
+  const r = STATE.resources || {};
+  const el = document.getElementById("materials-text");
+  if (!el) return;
+
+  el.textContent =
+    `Ore: Fe ${r.ironOre || 0} • Cu ${r.copperOre || 0} ` +
+    `• Au ${r.goldOre || 0} • Onyx ${r.onyx || 0} | ` +
+    `Ingots: Fe ${r.ironIngot || 0} • Cu ${r.copperIngot || 0} • Au ${r.goldIngot || 0}`;
+}
+
+function getActiveCompanion(){
+  const list = STATE.companions;
+  if (!list || !list.length) return null;
+  return list[0]; // first/only companion for now
+}
+
+function getCompanionStance(c){
+  const id = c && c.stance;
+  if (id === "defensive") {
+    return { id:"defensive", label:"Defensive", dmgMult:0.85, targetWeight:0.5 };
+  }
+  if (id === "aggressive") {
+    return { id:"aggressive", label:"Aggressive", dmgMult:1.25, targetWeight:2.0 };
+  }
+  // balanced default
+  return { id:"balanced", label:"Balanced", dmgMult:1.0, targetWeight:1.0 };
+}
+
+function companionStanceLabel(c){
+  const s = getCompanionStance(c);
+  return s.label || "Balanced";
+}
+
+function companionArmorRating(){
+  const comp = getActiveCompanion();
+  if (!comp || !comp.equipment) return 0;
+  let t = 0;
+  ["chest","boots","amulet","ring","shield"].forEach(slot => {
+    const it = comp.equipment[slot];
+    if (it && it.armor) t += it.armor;
+  });
+  return t;
+}
+
+function rescaleCompanion(c){
+  if (!c) return;
+  const pLevel = STATE.player.level || 1;
+  const base = c.baseMaxHealth || c.maxHealth || 80;
+  const perLevel = 6; // HP gained per player level
+  c.baseMaxHealth = base; // keep base stored
+  c.maxHealth = base + (pLevel - 1) * perLevel;
+  if (c.health == null || c.health > c.maxHealth) {
+    c.health = c.maxHealth;
+  }
+}
+
+function companionWeaponDmg(){
+  const comp = getActiveCompanion();
+  if (!comp || !comp.equipment) return 0;
+
+  const w = comp.equipment.weapon;
+  const base = (w && w.damage != null) ? w.damage : 6;
+
+  const warrior = (STATE.player.skills && STATE.player.skills.warrior) || 0;
+  const pLevel = STATE.player.level || 1;
+  const stance = getCompanionStance(comp);
+  const stanceMult = stance.dmgMult || 1;
+
+  let dmg = base + 1.5 * warrior;
+  dmg *= (1 + 0.06 * (pLevel - 1)); // scale with your level
+  dmg *= stanceMult;
+
+  return Math.round(dmg);
+}
+
+function companionAct(){
+  if (!STATE.combat.inCombat) return false;
+
+  const comp = getActiveCompanion();
+  const e = STATE.combat.enemy;
+
+  if (!comp || !e) return false;
+  if (comp.health != null && comp.health <= 0) return false; // knocked out
+
+  const w = comp.equipment && comp.equipment.weapon;
+  const wName = (w && w.name) || "weapon";
+
+  let base = companionWeaponDmg();
+  if (base <= 0) return false;
+
+  const dmg = Math.max(1, base + randInt(-2, 2));
+
+  e.health = clamp(e.health - dmg, 0, e.maxHealth);
+  updateEnemyPreview();
+
+  logMsg(
+    `<strong>${comp.name}</strong> strikes the ${e.name} with their <strong>${wName}</strong> for <strong>${dmg}</strong> damage.`,
+    "system"
+  );
+
+  if (e.health <= 0) {
+    endCombat(true);
+    return true;
+  }
+
+  saveGame();
+  return false;
+}
+
+function healCompanionAfterFight(){
+  const comp = getActiveCompanion();
+  if (!comp || comp.maxHealth == null) return;
+
+  if (comp.health <= 0) {
+    // Knocked out → get back on their feet, but not full
+    comp.health = Math.round(comp.maxHealth * 0.4);
+  } else {
+    // Small between-fight heal
+    comp.health = Math.min(comp.maxHealth, comp.health + Math.round(comp.maxHealth * 0.25));
+  }
+}
+
+function chooseEnemyTarget(){
+  const comp = getActiveCompanion();
+  if (!comp || comp.health == null || comp.health <= 0) {
+    return "player";
+  }
+
+  const stance = getCompanionStance(comp);
+  const w = stance.targetWeight || 1.0;
+
+  // chance player = 1 / (1+w), companion = w / (1+w)
+  const r = Math.random() * (1 + w);
+  return (r < 1) ? "player" : "companion";
+}
+
+function setCompanionStance(stanceId){
+  const comp = getActiveCompanion();
+  if (!comp) {
+    logMsg("You have no active companion to direct.","system");
+    return;
+  }
+  if (!["defensive","balanced","aggressive"].includes(stanceId)) return;
+
+  comp.stance = stanceId;
+  let desc;
+  if (stanceId==="defensive") {
+    desc = `${comp.name} raises their guard, staying closer to you and drawing fewer blows.`;
+  } else if (stanceId==="aggressive") {
+    desc = `${comp.name} surges forward, focusing on offense even if it means taking more hits.`;
+  } else {
+    desc = `${comp.name} balances offense and defense.`;
+  }
+
+  logMsg(`Companion stance set to <strong>${stanceId}</strong>. ${desc}`,"system");
+  updateBars();
+  saveGame();
+}
+
+function updateBars(){
+  const p=STATE.player;
+  const h=p.health/p.maxHealth*100,s=p.stamina/p.maxStamina*100,m=p.magicka/p.maxMagicka*100;
+  document.getElementById("health-bar").style.width=h+"%";
+  document.getElementById("stamina-bar").style.width=s+"%";
+  document.getElementById("magicka-bar").style.width=m+"%";
+  document.getElementById("health-text").textContent=`${p.health} / ${p.maxHealth}`;
+  document.getElementById("stamina-text").textContent=`${p.stamina} / ${p.maxStamina}`;
+  document.getElementById("magicka-text").textContent=`${p.magicka} / ${p.maxMagicka}`;
+  document.getElementById("gold-value").textContent=p.gold;
+  document.getElementById("potions-value").textContent=`H:${p.potions.health} S:${p.potions.stamina} M:${p.potions.magicka}`;
+  document.getElementById("zone-value").textContent=STATE.player.zone;
+  document.getElementById("player-level").textContent=`Level ${p.level} • ${p.xp} / ${p.xpToNext} XP`;
+  document.getElementById("stat-weapon-dmg").textContent=weaponDmg();
+  document.getElementById("stat-armor").textContent=armorRating();
+  document.getElementById("skill-points-value").textContent=STATE.player.skills?.points||0;
+
+  // Companion bar
+  const comp = getActiveCompanion();
+  const chBar = document.getElementById("companion-health-bar");
+  const chText = document.getElementById("companion-health-text");
+  if (chBar && chText) {
+    if (comp && comp.maxHealth > 0) {
+      const pct = (comp.health / comp.maxHealth) * 100;
+      chBar.style.width = pct + "%";
+      chText.textContent = `${comp.name} [${companionStanceLabel(comp)}]: ${comp.health} / ${comp.maxHealth}`;
+    } else {
+      chBar.style.width = "0%";
+      chText.textContent = "No companion";
+    }
+  }
+
+ // NEW: reputation line under companion bar
+  updateHudReputation();
+
+// Minerals line
+  updateResourcesUI();
+}
+
+function updateScene(){
+  const {x,y}=STATE.world;let z=STATE.player.zone;
+  if(STATE.world.inCave&&STATE.world.caveId){
+    const c=CAVE_BY_ID[STATE.world.caveId];if(c)z=c.tier;
+  }
+  const desc=inCity()?cityDesc(STATE.world.currentCity):regionDesc(x,y,z);
+
+  const locEl=document.getElementById("scene-location");
+  if(locEl)locEl.textContent=desc.location;
+
+  const titleEl=document.getElementById("scene-title");
+  if(titleEl)titleEl.textContent=desc.title;
+
+  const descEl=document.getElementById("scene-description");
+  if(descEl){
+    let html = desc.description;
+    const evt = STATE.world.lastCityEvent;
+    if(inCity() && evt && evt.icon && evt.short){
+      html += `<br><span class="scene-event-note">${evt.icon} ${evt.short}</span>`;
+    }
+    descEl.innerHTML = html;
+  }
+
+  document.getElementById("scene-tag-1").textContent=desc.tag1;
+  document.getElementById("scene-tag-2").textContent=desc.tag2;
+  document.getElementById("scene-time").textContent=TIMES[STATE.world.timeOfDayIndex%TIMES.length];
+
+  let region,compass;
+  if(inCity()){
+    const c=CITIES[STATE.world.currentCity];region=c?c.hold:"Unknown Hold";compass=c?c.name:"City";
+  }else if(STATE.world.inCave&&STATE.world.caveId){
+    const c=CAVE_BY_ID[STATE.world.caveId];region=c?c.name:"Cave";compass=c?c.name:"Cavern Depths";
+  }else{
+    region=regionName(x,y);compass=z===3?"High Peaks":z===2?"Frozen Wilds":"Frozen North";
+  }
+  document.getElementById("map-region-label").textContent=region;
+  document.getElementById("compass-location").textContent=compass;
+
+  const di=dangerInfo(x,y,z),de=document.getElementById("scene-danger");
+  if(di&&de)de.textContent=`Threat: ${di.icons} ${di.label}`;
+
+  // --- City reputation row ---
+  const repEl = document.getElementById("scene-rep");
+  if (repEl) {
+    if (inCity()) {
+      const cityId = STATE.world.currentCity;
+      const val = (STATE.reputation && STATE.reputation[cityId]) || 0;
+
+      let label = "Neutral";
+      if (val >= 15)      label = "Beloved";
+      else if (val >= 5)  label = "Liked";
+      else if (val <= -15)label = "Hated";
+      else if (val <= -5) label = "Disliked";
+
+      const c = CITIES[cityId];
+      const name = c ? c.name : cityId;
+      repEl.textContent = `${name}: ${label}`;
+    } else {
+      repEl.textContent = "Out in the wilds";
+    }
+  }
+
+  // --- Weather row ---
+  const weatherEl = document.getElementById("scene-weather");
+  if (weatherEl) {
+    let label = "Clear";
+
+    if (STATE.player.tempBlizzard && STATE.player.tempBlizzard > 0) {
+      label = "Blizzard building";
+    }
+    if (STATE.combat && STATE.combat.blizzardActive) {
+      label = "Blizzard (stamina +30% cost)";
+    }
+
+    weatherEl.textContent = label;
+  }
+} // <--- now updateScene ends here, correctly
+
+function updateReputationListUI(){
+  const el = document.getElementById("rep-all");
+  if (!el || !STATE.reputation || !CITIES) return;
+
+  const entries = [];
+
+  // iterate all cities in CITIES
+  for (const id in CITIES) {
+    if (!Object.prototype.hasOwnProperty.call(CITIES, id)) continue;
+    const city = CITIES[id];
+    if (!city) continue;
+
+    const rep = STATE.reputation[id] || 0;
+
+    let label;
+    if (rep >= 15)      label = "Beloved";
+    else if (rep >= 5)  label = "Liked";
+    else if (rep <= -15)label = "Hated";
+    else if (rep <= -5) label = "Disliked";
+    else                label = "Neutral";
+
+    const sign = rep > 0 ? "+" : rep < 0 ? "–" : "";
+    const abs  = Math.abs(rep);
+
+    entries.push(
+      `<span class="rep-entry"><strong>${city.name}</strong>: ${label} ` +
+      `<span class="rep-score">(${sign}${abs})</span></span>`
+    );
+  }
+
+  el.innerHTML = entries.join("<br>");
+}
+
+function updateHudReputation(){
+  const repHud = document.getElementById("hud-rep-summary");
+  if (!repHud) return;
+
+  if (inCity()) {
+    const cityId = STATE.world.currentCity;
+    const val = (STATE.reputation && STATE.reputation[cityId]) || 0;
+
+    let label = "Neutral";
+    if (val >= 15)      label = "Beloved";
+    else if (val >= 5)  label = "Liked";
+    else if (val <= -15)label = "Hated";
+    else if (val <= -5) label = "Disliked";
+
+    const sign = val > 0 ? "+" : val < 0 ? "–" : "";
+    const abs  = Math.abs(val);
+
+    const c    = CITIES[cityId];
+    const name = c ? c.name : cityId;
+
+    repHud.textContent = `${name}: ${label} (${sign}${abs})`;
+  } else {
+    repHud.textContent = "Reputation: Out in the wilds";
+  }
+}
+
+function updateBtns(){
+  const c = STATE.combat.inCombat;
+  const set=(id,d)=>{const el=document.getElementById(id);if(el)el.disabled=d};
+
+  set("btn-explore",c);
+  ["btn-attack","btn-block","btn-cast","btn-run"].forEach(id=>set(id,!c));
+  set("btn-potion",!c||totalPots(STATE.player.potions)<=0);
+  set("btn-race-power",!c||!STATE.player.raceId||STATE.combat.racialUsed);
+  const city=inCity();
+["btn-temple","btn-trainer","btn-smelter","btn-blacksmith","btn-black-market"]
+  .forEach(id=>set(id,!city||c));
+
+  // Shout button: cooldown + visual state
+  const shoutBtn = document.getElementById("btn-shout");
+  const p = STATE.player;
+
+  if (shoutBtn){
+    const hasShout = !!(p.shouts && p.shouts.equipped);
+    const cd = p.shoutCooldown || 0;
+
+    if (!c || !hasShout){
+      shoutBtn.disabled = !c || !hasShout;
+      shoutBtn.classList.remove("shout-cd","shout-ready");
+      shoutBtn.textContent = "Shout";
+    } else if (cd > 0){
+      shoutBtn.disabled = true;
+      shoutBtn.classList.add("shout-cd");
+      shoutBtn.classList.remove("shout-ready");
+      shoutBtn.textContent = `Shout (${cd})`;
+    } else {
+      shoutBtn.disabled = false;
+      shoutBtn.classList.add("shout-ready");
+      shoutBtn.classList.remove("shout-cd");
+      shoutBtn.textContent = "Shout (Ready)";
+    }
+  }
+}
+
+function updateEquipUI(){
+  // Always have a valid equipment object with all slots
+  const p = STATE.player || (STATE.player = {});
+  if (!p.equipment) p.equipment = {};
+  const eq = p.equipment;
+
+  ["weapon","shield","chest","boots","amulet","ring"].forEach(slot => {
+    if (!(slot in eq)) eq[slot] = null;
+  });
+
+  function shieldLabel(item){
+    if (!item || item.slot !== "shield") return "";
+    const st = item.shieldType;
+    if (st === "heavy")  return "Heavy Shield";
+    if (st === "unique") return "Unique Shield";
+    return "Light Shield";
+  }
+
+  function put(id,item){
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (!item){
+      el.textContent = "(empty)";
+      el.classList.add("empty");
+      return;
+    }
+
+    el.classList.remove("empty");
+
+    const r   = item.rarity || "common";
+    const lab = R_LABEL[r] || "Common";
+
+    let stat = "";
+    if (item.damage != null)      stat = `Damage: ${item.damage}`;
+    else if (item.armor != null)  stat = `Armor: ${item.armor}`;
+
+    let traitInfo = "";
+    if (item.slot === "amulet" || item.slot === "ring") {
+      const ts = traitSummary(item.slot, r);
+      if (ts) traitInfo = `<br><span class="inventory-meta">${ts}</span>`;
+    }
+
+    let shieldInfo = "";
+    if (item.slot === "shield") {
+      const sl = shieldLabel(item);
+      if (sl) shieldInfo = ` &nbsp; <span class="inventory-meta">${sl}</span>`;
+    }
+
+    el.innerHTML =
+      `${item.name}<br>` +
+      `<span class="rarity-tag rarity-${r}">${lab}</span>` +
+      `${stat ? ` &nbsp; <span class="inventory-meta">${stat}</span>` : ""}` +
+      shieldInfo +
+      traitInfo;
+  }
+// player gear
+  put("equip-weapon", eq.weapon);
+  put("equip-shield", eq.shield);
+  put("equip-chest",  eq.chest);
+  put("equip-boots",  eq.boots);
+  put("equip-amulet", eq.amulet);
+  put("equip-ring",   eq.ring);
+  // --- Companion equipment (first companion only) ---
+  const comp = getActiveCompanion && getActiveCompanion();
+  const nameEl = document.getElementById("companion-name-label");
+  if (nameEl) {
+    nameEl.textContent = comp ? ` (${comp.name})` : " (no companion)";
+  }
+
+  if (!comp) {
+    // No companion: mark slots empty
+    ["weapon","shield","chest","boots","amulet","ring"].forEach(slot => {
+      put("equipc-" + slot, null);
+    });
+    return;
+  }
+
+  if (!comp.equipment) comp.equipment = {};
+  const ceq = comp.equipment;
+
+  ["weapon","shield","chest","boots","amulet","ring"].forEach(slot => {
+    if (!(slot in ceq)) ceq[slot] = null;
+  });
+
+  put("equipc-weapon", ceq.weapon);
+  put("equipc-shield", ceq.shield);
+  put("equipc-chest",  ceq.chest);
+  put("equipc-boots",  ceq.boots);
+  put("equipc-amulet", ceq.amulet);
+  put("equipc-ring",   ceq.ring);
+}
+
+function updateShouts(){
+  const p = STATE.player || {};
+  const sh = p.shouts || { known:[], levels:{}, equipped:null };
+  const list = document.getElementById("shout-list");
+  const label = document.getElementById("shout-equipped-label");
+  if (!list || !label) return;
+
+  list.innerHTML = "";
+
+  if (!sh.known || !sh.known.length){
+    label.textContent = "Equipped shout: none";
+    return;
+  }
+
+  const eqId = sh.equipped;
+  const eqDef = eqId && SHOUTS[eqId];
+  label.textContent = eqDef
+    ? `Equipped shout: ${eqDef.name}`
+    : "Equipped shout: none";
+
+  sh.known.forEach(id => {
+    const def = SHOUTS[id];
+    if (!def) return;
+
+    const level = (sh.levels && sh.levels[id]) || 1;
+
+    const li = document.createElement("li");
+    li.className = "shout-entry" + (id === eqId ? " equipped" : "");
+
+    const name = document.createElement("div");
+    name.className = "shout-name";
+    name.textContent = def.name;
+
+    const meta = document.createElement("div");
+    meta.className = "shout-meta";
+    meta.textContent = `Type: ${def.type} • Word level: ${level}`;
+
+    const btn = document.createElement("button");
+    btn.className = "action-btn small";
+    btn.textContent = (id === eqId) ? "Equipped" : "Equip";
+    btn.disabled = (id === eqId);
+    btn.onclick = () => {
+      STATE.player.shouts.equipped = id;
+      logMsg(`You ready the shout <strong>${def.name}</strong>.`, "system");
+      updateShouts();
+      updateShoutButtonLabel();
+      saveGame();
+    };
+
+    name.appendChild(meta);
+    li.append(name, btn);
+    list.appendChild(li);
+  });
+}
+
+function updateShoutButtonLabel(){
+  const btn = document.getElementById("btn-shout");
+  if (!btn) return;
+
+  const p = STATE.player;
+  const cd = (p && typeof p.shoutCooldown === "number") ? p.shoutCooldown : 0;
+
+  // Keep the hotkey span if it exists
+  const hotkey = btn.querySelector(".hotkey");
+  const hotkeyHTML = hotkey ? hotkey.outerHTML : "";
+
+  let label = "Shout";
+  if (cd > 0){
+    label = `Shout (${cd})`;
+  }
+
+  btn.innerHTML = label + hotkeyHTML;
+}
+
+function tickShoutCooldown(){
+  const p = STATE.player;
+  if (!p || typeof p.shoutCooldown !== "number") return;
+
+  if (p.shoutCooldown > 0){
+    p.shoutCooldown = Math.max(0, p.shoutCooldown - 1);
+
+    if (p.shoutCooldown === 0){
+      logMsg("Your Thu'um is ready to use again.","system");
+    }
+  }
+
+  // ensure the button text matches the current cooldown
+  updateShoutButtonLabel();
+}
+
+
+function updateSpells(){
+  const ps = STATE.player.spells || { known:[], equipped:null };
+  const list = document.getElementById("spell-list");
+  const label = document.getElementById("spell-equipped-label");
+  if (!list || !label) return;
+
+  list.innerHTML = "";
+  const eqId = ps.equipped;
+
+  if (!ps.known || !ps.known.length) {
+    label.textContent = "Equipped spell: none";
+    return;
+  }
+
+  const defEq = eqId && SPELLS[eqId];
+  if (defEq) {
+    label.textContent = `Equipped spell: ${defEq.name}`;
+  } else {
+    label.textContent = "Equipped spell: none";
+  }
+
+  ps.known.forEach(entry => {
+    const def = SPELLS[entry.id];
+    if (!def) return;
+
+    const li = document.createElement("li");
+    li.className = "shout-entry" + (entry.id === eqId ? " equipped" : "");
+
+    const name = document.createElement("div");
+    name.className = "shout-name";
+    name.textContent = def.name;
+
+    const rarity = entry.rarity || "common";
+    const rTag = document.createElement("span");
+    rTag.className = "rarity-tag rarity-" + rarity;
+    rTag.textContent = R_LABEL[rarity] || "Common";
+
+    const meta = document.createElement("div");
+    meta.className = "shout-meta";
+    meta.textContent = `DMG ${def.minDamage}-${def.maxDamage} • Cost ${def.baseCost}`;
+
+    const btn = document.createElement("button");
+    btn.className = "action-btn small";
+    btn.textContent = (entry.id === eqId) ? "Equipped" : "Equip";
+    btn.disabled = (entry.id === eqId);
+    btn.onclick = () => {
+      STATE.player.spells.equipped = entry.id;
+      logMsg(`You ready the spell <strong>${def.name}</strong>.`, "system");
+      updateSpells();
+      saveGame();
+    };
+
+    name.appendChild(rTag);
+    li.append(name, meta, btn);
+    list.appendChild(li);
+  });
+}
+
+function updateSkillsUI(){
+  const s=STATE.player.skills||{warrior:0,mage:0,thief:0,points:0};
+  document.getElementById("skill-points-value").textContent=s.points||0;
+  const bw=document.getElementById("btn-skill-warrior"),bm=document.getElementById("btn-skill-mage"),bt=document.getElementById("btn-skill-thief");
+  if(bw)bw.textContent=`Warrior (${s.warrior||0})`;
+  if(bm)bm.textContent=`Mage (${s.mage||0})`;
+  if(bt)bt.textContent=`Thief (${s.thief||0})`;
+}
+
+function updateMarker(){
+  const marker = document.getElementById("map-marker");
+  if (!marker) return;
+
+  const max = 6;
+
+  // Always use raw world coordinates – cities and wilds
+  let x = STATE.world.x;
+  let y = STATE.world.y;
+
+  // Clamp to map bounds
+  x = clamp(x, -max, max);
+  y = clamp(y, -max, max);
+
+  marker.style.left = ((x + max) / (2 * max)) * 100 + "%";
+  marker.style.top  = ((-y + max) / (2 * max)) * 100 + "%";
+}
+
+
+function updatePotionBtns(){document.querySelectorAll(".potion-type-btn").forEach(b=>b.classList.toggle("active",b.dataset.potion===STATE.player.selectedPotion))}
+
+function updateInventory() {
+  try {
+    const list = document.getElementById("inventory-list");
+    const shop = document.getElementById("shop-list");
+    if (!list || !shop) return;
+
+    const inv = Array.isArray(STATE.inventory) ? STATE.inventory : [];
+    const shopItems =
+      STATE.shop && Array.isArray(STATE.shop.items) ? STATE.shop.items : [];
+
+    // ---------- INVENTORY ----------
+    list.innerHTML = "";
+
+    if (!inv.length) {
+      const e = document.createElement("div");
+      e.className = "inventory-item";
+      e.textContent = "Your pack is empty.";
+      list.appendChild(e);
+    } else {
+      const canSell = inCity();
+
+      inv.forEach((it, idx) => {
+        const item = it || {};
+        const c = document.createElement("div");
+        c.className = "inventory-item";
+
+        const main = document.createElement("div");
+        main.className = "inventory-main-row";
+
+        const n = document.createElement("div");
+        n.className = "inventory-name";
+        n.textContent = item.name || "Unknown item";
+
+        const r = document.createElement("span");
+        r.className = "rarity-tag rarity-" + (item.rarity || "common");
+        r.textContent = R_LABEL[item.rarity] || "Common";
+
+        main.append(n, r);
+
+        const sub = document.createElement("div");
+        sub.className = "inventory-subrow";
+
+        const meta = document.createElement("div");
+        meta.className = "inventory-meta";
+
+        const stat =
+          item.damage != null
+            ? "Damage: " + item.damage
+            : item.armor != null
+            ? "Armor: " + item.armor
+            : "";
+
+        const val =
+          item.value != null ? "Value: " + item.value + "g" : "";
+
+        const parts = [];
+        if (item.slot) parts.push(item.slot.toUpperCase());
+        if (stat) parts.push(stat);
+        if (val) parts.push(val);
+
+        meta.textContent = parts.join(" • ") || "Misc item";
+
+       const btns = document.createElement("div");
+btns.className = "inventory-buttons";
+
+// Equip to YOU
+const be = document.createElement("button");
+be.className = "inventory-equip-btn";
+be.textContent = "Equip (you)";
+be.onclick = () => equipFromInv(idx, "player");
+
+// Equip to COMPANION
+const bc = document.createElement("button");
+bc.className = "inventory-equip-btn";
+bc.textContent = "Equip (comp)";
+bc.onclick = () => equipFromInv(idx, "companion");
+
+// Sell
+const bs = document.createElement("button");
+bs.className = "inventory-sell-btn";
+bs.textContent = canSell ? "Sell" : "Sell (city)";
+bs.disabled = !canSell;
+if (!canSell) bs.title = "You must be in a city to sell.";
+bs.onclick = () => sellFromInv(idx);
+
+btns.append(be, bc, bs);
+        sub.append(meta, btns);
+        c.append(main, sub);
+        list.appendChild(c);
+      });
+    }
+
+    // ---------- SHOP ----------
+    shop.innerHTML = "";
+    const city = inCity();
+
+    if (!city) {
+      const m = document.createElement("div");
+      m.className = "shop-item";
+      m.textContent = "You must be in a city to browse the markets.";
+      shop.appendChild(m);
+    } else if (!shopItems.length) {
+      const m = document.createElement("div");
+      m.className = "shop-item";
+      m.textContent =
+        "Merchants are between caravans. Explore or fast travel to refresh stock.";
+      shop.appendChild(m);
+    } else {
+      shopItems.forEach((of, idx) => {
+        const offer = of || {};
+        const c = document.createElement("div");
+        c.className = "shop-item";
+
+        const main = document.createElement("div");
+        main.className = "shop-main-row";
+
+        const n = document.createElement("div");
+        n.className = "shop-name";
+        n.textContent = offer.name || "Unknown item";
+
+        const r = document.createElement("span");
+        r.className = "rarity-tag rarity-" + (offer.rarity || "common");
+        r.textContent = R_LABEL[offer.rarity] || "Common";
+
+        main.append(n, r);
+
+        const sub = document.createElement("div");
+        sub.className = "shop-subrow";
+
+        const meta = document.createElement("div");
+        meta.className = "shop-meta";
+
+        const stat =
+          offer.damage != null
+            ? "Damage: " + offer.damage
+            : offer.armor != null
+            ? "Armor: " + offer.armor
+            : "";
+
+        const parts = [];
+        if (offer.slot) parts.push(offer.slot.toUpperCase());
+        if (stat) parts.push(stat);
+        parts.push("Price: " + (offer.price != null ? offer.price : 0) + "g");
+
+        meta.textContent = parts.join(" • ");
+
+        const btns = document.createElement("div");
+        btns.className = "shop-buttons";
+
+        const b = document.createElement("button");
+        b.className = "shop-buy-btn";
+        b.textContent = "Buy";
+
+        const enoughGold =
+          STATE.player && STATE.player.gold >= (offer.price || 0);
+
+        b.disabled = !city || !enoughGold;
+        if (!city) b.title = "You must be in a city to buy.";
+        else if (!enoughGold) b.title = "Not enough gold.";
+        b.onclick = () => buyFromShop(idx);
+
+        btns.appendChild(b);
+        sub.append(meta, btns);
+        c.append(main, sub);
+        shop.appendChild(c);
+      });
+    }
+  } catch (err) {
+    console.error("updateInventory error", err);
+  }
+}
+ function updateEnemyPreview(){
+  const box = document.getElementById("enemy-preview");
+  if (!box) return;
+
+  const nameEl = document.getElementById("enemy-name");
+  const hpBar  = document.getElementById("enemy-health-bar");
+  const hpText = document.getElementById("enemy-health-text");
+  const meta   = document.getElementById("enemy-meta");
+
+  const e = STATE.combat && STATE.combat.enemy;
+
+  // No combat or no enemy → reset display
+  if (!STATE.combat || !STATE.combat.inCombat || !e) {
+    if (nameEl) nameEl.textContent = "None";
+    if (hpBar)  hpBar.style.width  = "0%";
+    if (hpText) hpText.textContent = "";
+    if (meta)   meta.textContent   = "No enemy engaged.";
+    return;
+  }
+
+  // Basic HP bar / text
+  const pct = (e.health / e.maxHealth) * 100;
+  if (nameEl) nameEl.textContent = e.name;
+  if (hpBar)  hpBar.style.width  = pct + "%";
+  if (hpText) hpText.textContent = `${e.health} / ${e.maxHealth}`;
+
+  // Simple meta line (keep it robust)
+  if (meta) {
+    const tier  = e.tier ?? 1;
+    const type  = e.type || "Unknown";
+    const minD  = e.minDamage ?? "?";
+    const maxD  = e.maxDamage ?? "?";
+    const icons = tier === 1 ? "⚔" : tier === 2 ? "⚔⚔" : "⚔⚔⚔";
+    meta.textContent = `${type} • Tier ${tier} • DMG ${minD}-${maxD} • ${icons} threat`;
+  }
+}
+
+function fullUpdate(){
+  // Core HUD + scene
+  updateBars();
+  updateRaceUI();
+  updateEnemyPreview();
+  updateScene();
+  updateBtns();
+  updateEquipUI();
+
+  // Magic & shouts
+  updateShouts();
+  updateSpells();
+  updateShoutButtonLabel();
+
+  // Skills & resources
+  updateSkillsUI();
+  updateResourcesUI();
+
+  // World + map
+  updateMarker();
+  updateWorldUI();
+
+  // Inventory / bestiary
+  updatePotionBtns();
+  updateInventory();
+  updateBestiary();
+
+  // Reputation list in Status tab
+  updateReputationListUI();
+
+  // Persist
+  saveGame();
+}
+
+
+function levelUp(){
+  const p=STATE.player;
+  while(p.xp>=p.xpToNext){
+    p.xp-=p.xpToNext;p.level++;p.xpToNext=Math.floor(p.xpToNext*1.6);
+    p.maxHealth+=15;p.maxStamina+=8;p.maxMagicka+=6;
+    p.health=p.maxHealth;p.stamina=p.maxStamina;p.magicka=p.maxMagicka;
+    p.skills.points=(p.skills.points||0)+1;
+    if(p.level===4)p.zone=2;if(p.level===7)p.zone=3;
+    const comp = getActiveCompanion();
+    if (comp) {
+      rescaleCompanion(comp);
+      comp.health = comp.maxHealth;
+    }
+    logMsg(`<strong>You feel power course through you. You reached level ${p.level}!</strong>`,"system");
+    logMsg("Your maximum Health, Stamina, and Magicka have increased. You feel fully restored.","system");
+    logMsg("You have gained <strong>1 skill point</strong> to spend in your skill trees.","system");
+    if (p.level === 10) {
+      logMsg(
+        `Achievement unlocked: <strong>Seasoned Adventurer</strong> — reached level 10.`,
+        "quest"
+      );
+    }
+  }
+}
+
+function equipFromInv(i, target){
+  const it = STATE.inventory[i];
+  if (!it) return;
+
+  const slot = it.slot;
+  if (!slot) {
+    logMsg("This item cannot be equipped.","system");
+    return;
+  }
+
+  let eqObj;
+  let ownerName;
+
+  if (target === "companion") {
+    // first/only companion
+    const comp = STATE.companions && STATE.companions[0];
+    if (!comp) {
+      logMsg("You have no active companion to equip.","system");
+      return;
+    }
+    if (!comp.equipment) comp.equipment = {};
+    eqObj = comp.equipment;
+    ownerName = comp.name || "your companion";
+  } else {
+    // default: player
+    eqObj = STATE.player.equipment;
+    ownerName = "yourself";
+  }
+
+  const cur = eqObj[slot] || null;
+
+  // swap in/out of inventory
+  STATE.inventory.splice(i, 1);
+  if (cur) STATE.inventory.push(cur);
+  eqObj[slot] = it;
+
+  logMsg(
+    `You equip <strong>${it.name}</strong> on <strong>${ownerName}</strong> <span class="rarity-tag rarity-${it.rarity}">${R_LABEL[it.rarity] || "Common"}</span>.`,
+    "system"
+  );
+
+  fullUpdate();
+}
+
+function sellFromInv(i){
+  const it=STATE.inventory[i];if(!it)return;
+  if(!inCity()){logMsg("You need to be inside a city to sell loot.","system");return}
+  const city=CITIES[STATE.world.currentCity],name=city?city.name:"town",v=it.value!=null?it.value:5;
+  STATE.player.gold+=v;STATE.inventory.splice(i,1);
+  logMsg(`You sell <strong>${it.name}</strong> for <strong>${v} gold</strong> at a market stall in ${name}.`,"loot");
+  fullUpdate();
+}
+
+function buyFromShop(i){
+  const of = STATE.shop.items[i];
+  if (!of) return;
+
+  if (!inCity()) {
+    logMsg("You must be in a city to buy from merchants.","system");
+    return;
+  }
+
+  if (STATE.player.gold < of.price) {
+    logMsg(`You don't have enough gold to buy <strong>${of.name}</strong>.`,"system");
+    return;
+  }
+
+  const city = CITIES[STATE.world.currentCity];
+  const name = city ? city.name : "town";
+
+  // pay & add a copy of the item to inventory
+  STATE.player.gold -= of.price;
+  STATE.inventory.push({ ...of });   // spread copies all fields of the offer
+  STATE.shop.items.splice(i, 1);     // remove from shop
+
+  logMsg(
+    `You purchase <strong>${of.name}</strong> for <strong>${of.price} gold</strong> in ${name}.`,
+    "loot"
+  );
+
+  fullUpdate();
+}
+
+function awardPots(){
+  const p=STATE.player.potions,m=[];
+  if(Math.random()<.35){p.health++;m.push("Health potion")}
+  if(Math.random()<.25){p.stamina++;m.push("Stamina potion")}
+  if(Math.random()<.22){p.magicka++;m.push("Magicka potion")}
+  if(m.length)logMsg(`You also find: <strong>${m.join(", ")}</strong>.`,"loot");
+}
+
+function learnSpellFromBook(spellId,rarity){
+  const def=SPELLS[spellId];if(!def)return;
+  const ps=STATE.player.spells||(STATE.player.spells={known:[],equipped:null});
+  let cur=ps.known.find(s=>s.id===spellId);
+  const lab=R_LABEL[rarity]||"Common";
+  if(!cur){
+    ps.known.push({id:spellId,rarity});if(!ps.equipped)ps.equipped=spellId;
+    logMsg(`You study a newly found spellbook and learn <strong>${def.name}</strong> (${lab}).`,"loot");
+  }else{
+    if(rarityRank(rarity)>rarityRank(cur.rarity)){
+      const oldLab=R_LABEL[cur.rarity]||"Common";cur.rarity=rarity;
+      logMsg(`You pore over an advanced tome of <strong>${def.name}</strong>, upgrading it from ${oldLab} to <strong>${lab}</strong>.`,"loot");
+    }else{
+      logMsg(`You skim a familiar spellbook of <strong>${def.name}</strong>, but learn nothing new.`,"loot");
+    }
+  }
+}
+
+function maybeSpellbookDrop(){
+  if(Math.random()<.22){
+    const ids=Object.keys(SPELLS);const sid=ids[randInt(0,ids.length-1)];
+    const rar=RARITY_ORDER[randInt(0,RARITY_ORDER.length-1)];
+    learnSpellFromBook(sid,rar);
+  }
+}
+
+function dropLoot(e){
+  // Use cave tier for loot if inside a cave, otherwise player zone
+  let z = STATE.player.zone;
+  if (STATE.world.inCave && STATE.world.caveId) {
+    const cave = CAVE_BY_ID[STATE.world.caveId];
+    if (cave) z = cave.tier;
+  }
+
+  const q = e.lootQuality || 1;
+  let base = randInt(0, 2);
+  let c = Math.round(base * q);
+
+  // Normal boss guarantee
+  if (e.boss && c < 2) c = 2;
+
+  // Legendary cave mode: boss + in cave
+  const inLegendaryCave = e.boss && STATE.world.inCave && STATE.world.caveId;
+
+  // Legendary caves always give at least 3 items
+  if (inLegendaryCave && c < 3) c = 3;
+
+  if (c <= 0) {
+    awardPots();
+    if (e.lootNote) {
+      logMsg(
+        `Among the remains you notice traces of <strong>${e.lootNote}</strong>, but nothing you can carry.`,
+        "loot"
+      );
+    }
+    maybeSpellbookDrop();
+    fullUpdate();
+    return;
+  }
+
+  const parts = [];
+  let epicGiven = false;
+
+  for (let i = 0; i < c; i++) {
+    let it;
+
+    // On the last roll in a legendary cave, force an epic if we didn't see one yet
+    if (inLegendaryCave && !epicGiven && i === c - 1) {
+      it = makeLoot(z, "epic");
+    } else {
+      it = makeLoot(z);
+    }
+
+    if (it.rarity === "epic") epicGiven = true;
+
+    STATE.inventory.push(it);
+    parts.push(
+      `${it.name} <span class="rarity-tag rarity-${it.rarity}">${R_LABEL[it.rarity]}</span>`
+    );
+  }
+
+  let msg = `From the ${e.name}, you recover: ${parts.join(", ")}.`;
+  if (e.lootNote) {
+    msg += `<br><span class="inventory-meta">This foe was known for <strong>${e.lootNote}</strong>.</span>`;
+  }
+  if (inLegendaryCave) {
+    msg += `<br><span class="inventory-meta">The air hums with power — this was <strong>legendary cave</strong> loot.</span>`;
+  }
+
+  logMsg(msg, "loot");
+  awardPots();
+  maybeSpellbookDrop();
+  fullUpdate();
+}
+
+function nearestCity(x,y){
+  let best=null,dBest=1e9;
+  for(const id in CITIES){
+    const c=CITIES[id],dx=c.x-x,dy=c.y-y,d=Math.abs(dx)+Math.abs(dy);
+    if(d<dBest){dBest=d;best=id}
+  }
+  return best;
+}
+
+function adjustReputation(cityId, delta){
+  if (!cityId) return;
+  const rep = STATE.reputation || (STATE.reputation = {});
+  rep[cityId] = (rep[cityId] || 0) + delta;
+}
+
+function questOnKill(e){
+  const q=STATE.quests||(STATE.quests=qDef());
+  if(q.u&&!q.u.c&&e.group==="Undead"){
+    q.u.p++;
+    if(q.u.p>=q.u.t){
+      q.u.c=true;const g=80+randInt(0,40);STATE.player.gold+=g;STATE.player.potions.health+=2;STATE.player.potions.stamina+=1;STATE.player.potions.magicka+=1;
+      logMsg(`Quest complete: <strong>Purging the Dead</strong>. You receive <strong>${g} gold</strong> and several potions for cleansing the undead threat.`,"system");
+      const curCity = inCity()
+        ? STATE.world.currentCity
+        : nearestCity(STATE.world.x, STATE.world.y);
+      adjustReputation(curCity, 2);
+      const cname = CITIES[curCity] ? CITIES[curCity].name : curCity;
+      logMsg(
+        `Word of your campaign against the undead spreads in <strong>${cname}</strong>. Locals regard you more highly.`,
+        "event"
+      );
+      const comp = getActiveCompanion();
+      if (comp) {
+        comp.baseMaxHealth = (comp.baseMaxHealth || comp.maxHealth || 80) + 10;
+        rescaleCompanion(comp);
+        logMsg(`<strong>${comp.name}</strong> grows hardier from your campaign against the undead. Their maximum health has increased.`,"system");
+      }
+    }else logMsg(`Quest progress: <strong>Purging the Dead</strong> (${q.u.p}/${q.u.t} undead defeated).`,"system");
+  }
+}
+
+function maybeUnlockShoutFromBoss(enemy){
+  // Only care if we are / were in a cave
+  if (!STATE.world.inCave || !STATE.world.caveId) return;
+
+  const cave = CAVE_BY_ID[STATE.world.caveId];
+  if (!cave || !cave.bossId || cave.bossId !== enemy.id) return;
+
+  const sh = STATE.player.shouts || (STATE.player.shouts = { known:[], equipped:null });
+  if (!Array.isArray(sh.known)) sh.known = [];
+
+  // Which shouts from the pool do we NOT know yet?
+  const unknown = CAVE_SHOUT_POOL.filter(id => SHOUTS[id] && !sh.known.includes(id));
+
+  if (!unknown.length) {
+    logMsg(
+      `The ancient word wall shimmers faintly, but you already know every shout it could teach.`,
+      "system"
+    );
+    return;
+  }
+
+  // Pick one at random and unlock it
+  const idx = randInt(0, unknown.length - 1);
+  const chosen = unknown[idx];
+
+  unlockShout(chosen, cave.name);
+  updateShouts();
+  saveGame();
+}
+
+function haveEpic(){
+  const eq=STATE.player.equipment;
+  for(const s of SLOTS){
+    const it=eq[s];if(it&&it.rarity==="epic")return true;
+  }
+  for(const it of STATE.inventory){if(it.rarity==="epic")return true}
+  return false;
+}
+
+function checkEpicQuest(cityId){
+  const q=STATE.quests||(STATE.quests=qDef());if(!q.e||q.e.c)return;
+  if(cityId!==q.e.city)return;
+  if(!haveEpic()){
+    logMsg("A courtier in Solitude seeks a <strong>truly epic</strong> relic. Return when you carry one worthy of the Blue Palace.","system");return;
+  }
+   q.e.c=true;const g=200+randInt(0,120);STATE.player.gold+=g;STATE.player.xp+=40;STATE.player.potions.health+=2;STATE.player.potions.magicka+=2;
+  logMsg(`Quest complete: <strong>Relic for the Court</strong>. The nobles of Solitude grant you <strong>${g} gold</strong>, rare potions, and hard-won experience.`,"system");
+
+  const comp = getActiveCompanion();
+  if (comp) {
+    comp.baseMaxHealth = (comp.baseMaxHealth || comp.maxHealth || 80) + 12;
+    rescaleCompanion(comp);
+    logMsg(`<strong>${comp.name}</strong> seems emboldened by the court's favor, becoming tougher in battle.`,"system");
+  }
+
+  levelUp();fullUpdate();
+}
+
+function startCombat(){
+  let z = STATE.player.zone;
+  let enemyDef = null;
+
+  // Are we in a cave?
+  if (STATE.world.inCave && STATE.world.caveId) {
+    const cave = CAVE_BY_ID[STATE.world.caveId];
+    if (cave) {
+      z = cave.tier;
+
+      // Try to roll a cave boss if this cave has one
+      if (cave.bossId && Math.random() < (cave.bossChance || 0.3)) {
+        const base = ENEMIES.find(e => e.id === cave.bossId);
+        if (base) {
+          const boosted = { ...base };
+
+          // Make the cave version nastier
+          boosted.maxHealth = Math.round(base.maxHealth * 1.35);
+          boosted.minDamage = Math.round(base.minDamage * 1.2);
+          boosted.maxDamage = Math.round(base.maxDamage * 1.2);
+
+          boosted.boss = true;
+          boosted.lootQuality = (base.lootQuality || 1) * 1.6;
+
+          enemyDef = boosted;
+        }
+      }
+    }
+  }
+
+  // If we didn't spawn a cave boss, fall back to normal encounter for the tier
+  if (!enemyDef) {
+    const arr = E_ZONE[z] || E_ZONE[1];
+    const def = arr[randInt(0, arr.length - 1)];
+    enemyDef = def;
+  }
+
+  const enemy = { ...enemyDef, health: enemyDef.maxHealth };
+
+    // --- Travel buffs/debuffs for this battle ---
+  STATE.combat.enemy = enemy;
+  STATE.combat.inCombat = true;
+  STATE.combat.playerBlocking = false;
+  STATE.combat.racialUsed = false;
+  STATE.combat.blockProfile = null;
+
+  // reset flags each fight
+  STATE.combat.blizzardActive = false;
+  STATE.combat.shrineBoost = false;
+
+  // If you were caught in a blizzard, apply its effect to this fight
+  if (STATE.player.tempBlizzard && STATE.player.tempBlizzard > 0) {
+    STATE.player.tempBlizzard--;
+    STATE.combat.blizzardActive = true;
+    logMsg(
+      `<span class="inventory-meta" style="color:#99d;">
+        The howling blizzard makes every movement more draining this battle.
+       </span>`,
+      "event"
+    );
+  }
+  // Well Rested: if you have charges, apply one to this fight
+  if (STATE.player.tempRestedBuff && STATE.player.tempRestedBuff > 0) {
+    STATE.player.tempRestedBuff--;
+    STATE.combat.restedBuff = true;
+    logMsg(
+      "You feel the lingering comfort of a warm bed. Your stamina is easier to manage this battle.",
+      "system"
+    );
+  } else {
+    STATE.combat.restedBuff = false;
+  }
+  // If you carry a shrine blessing, apply it to this fight
+  if (STATE.player.tempShrineBuff && STATE.player.tempShrineBuff > 0) {
+    STATE.player.tempShrineBuff--;
+    STATE.combat.shrineBoost = true;
+    logMsg(
+      `<span class="inventory-meta" style="color:#ffe680;">
+        Divine warmth lingers — your blows will strike harder in this fight.
+       </span>`,
+      "event"
+    );
+  }
+
+  logMsg(
+    `You are confronted by a <strong>${enemy.name}</strong>${enemy.boss ? " (Boss)" : ""}!`,
+    "enemy"
+  );
+  updateBtns();
+  updateScene();
+  fullUpdate();
+}
+
+function endCombat(win){
+  const e=STATE.combat.enemy;if(!e)return;
+  if(win){
+    const xp=e.xp;let g=randInt(e.gold[0],e.gold[1]);
+    const traits=getTraitEffects(),goldMult=1+(traits.goldBonus||0);g=Math.round(g*goldMult);
+    STATE.player.xp+=xp;STATE.player.gold+=g;
+    logMsg(`You defeated the <strong>${e.name}</strong>! (+${xp} XP, +${g} gold)`,"loot");
+if (e.group === "Dragon"){
+  STATE.player.dragonSouls++;
+  logMsg(`<span style="color:#6cf;">You absorb a <strong>Dragon Soul</strong>. (${STATE.player.dragonSouls})</span>`,"event");
+}
+      if ((STATE.player.dragonSouls || 0) === 1) {
+        logMsg(
+          `Achievement unlocked: <strong>Dragon Slayer</strong> — absorbed your first Dragon Soul.`,
+          "quest"
+        );
+      }
+    dropLoot(e);
+    markDefeated(e.id);
+    questOnKill(e);
+
+    // 🔹 New: if this was a cave boss, unlock a shout from the word wall
+    maybeUnlockShoutFromBoss(e);
+
+    levelUp();
+  }else{
+    logMsg(`You slip away into the snow, leaving the ${e.name} behind.`,"event");
+  }
+   STATE.combat.enemy = null;
+  STATE.combat.inCombat = false;
+  STATE.combat.playerBlocking = false;
+  STATE.combat.racialUsed = false;
+  STATE.combat.blockProfile = null;
+  STATE.combat.blizzardActive = false;
+  STATE.combat.shrineBoost = false;
+
+  // 🔹 Reset shout cooldown when combat ends
+  if (STATE.player) {
+    STATE.player.shoutCooldown = 0;
+  }
+
+  // restore player stamina fully after combat
+  if (STATE.player && STATE.player.maxStamina != null) {
+    STATE.player.stamina = STATE.player.maxStamina;
+  }
+
+  healCompanionAfterFight();
+  updateBtns();updateScene();fullUpdate();
+}
+
+
+function enemyTurn(){
+  const enemy = STATE.combat.enemy;
+  if (!enemy || !STATE.combat.inCombat) return;
+
+  // Each enemy action advances shout cooldown
+  tickShoutCooldown();
+
+  const target = chooseEnemyTarget();
+  const isPlayer = (target === "player");
+  const p = STATE.player;
+  const comp = getActiveCompanion();
+  const thief = STATE.player.skills?.thief || 0;
+
+  const blocking = isPlayer && !!STATE.combat.playerBlocking;
+  const prof = blocking ? (STATE.combat.blockProfile || currentShieldProfile()) : null;
+
+  // --- DRAGON BREATH SETUP ---
+  const isDragon = enemy.group === "Dragon" || enemy.type === "Dragon";
+  let isBreath = false;
+  let breathType = null; // "fire" | "frost" | null
+
+  if (isDragon && Math.random() < 0.4) { // 40% chance this turn is a breath attack
+    if (enemy.element === "frost" || enemy.id === "frost_dragon") {
+      breathType = "frost";
+    } else {
+      breathType = "fire";
+    }
+    isBreath = true;
+  }
+
+  // miss chance
+  let missBase = blocking ? 0.35 : 0.12;
+  if (isBreath) {
+    // breath is harder to dodge
+    missBase = blocking ? 0.25 : 0.08;
+  }
+
+  const thiefBonus = isPlayer ? 0.02 * thief : 0;
+  const miss = missBase + thiefBonus;
+
+  if (Math.random() < miss) {
+    if (isPlayer) {
+      logMsg(
+        `The <strong>${enemy.name}</strong>'s ${isBreath ? "breath attack" : "strike"} <em>misses</em> you!`,
+        "enemy"
+      );
+    } else if (comp) {
+      logMsg(
+        `The <strong>${enemy.name}</strong> ${isBreath ? "belches breath at" : "swings at"} <strong>${comp.name}</strong> but <em>misses</em>!`,
+        "enemy"
+      );
+    }
+    STATE.combat.playerBlocking = false;
+    STATE.combat.blockProfile = null;
+    saveGame();
+    return;
+  }
+
+  let dmg = randInt(enemy.minDamage, enemy.maxDamage);
+  if (isBreath) {
+    // breath is nastier than a claw swipe
+    dmg = Math.round(dmg * (breathType === "frost" ? 1.15 : 1.25));
+  }
+
+  let red = 0;
+
+  if (isPlayer) {
+    red = armorRating() / 60;
+
+    // shield / guard reduction
+    if (blocking) {
+      const shieldBlock = prof ? prof.blockBonus : 0.20;
+      red += shieldBlock;
+    }
+
+    // thief mitigation
+    red += 0.02 * thief;
+
+    // higher cap because shields exist
+    red = Math.min(0.8, red);
+  } else {
+    // companion armor, slightly lower cap
+    red = companionArmorRating() / 65;
+    red = Math.min(0.75, red);
+  }
+
+  // unique shield: negate (player only)
+  if (
+    isPlayer &&
+    blocking &&
+    prof &&
+    prof.special &&
+    prof.special.negateChance &&
+    Math.random() < prof.special.negateChance
+  ) {
+    logMsg(
+      `Your <strong>${prof.label}</strong> flares with power, completely <strong>negating</strong> the ${enemy.name}'s ${isBreath ? "breath" : "blow"}!`,
+      "enemy"
+    );
+    STATE.combat.playerBlocking = false;
+    STATE.combat.blockProfile = null;
+    saveGame();
+    return;
+  }
+
+  dmg = Math.max(1, Math.round(dmg * (1 - red)));
+
+  if (isPlayer) {
+    p.health = clamp(p.health - dmg, 0, p.maxHealth);
+
+    if (blocking) {
+      const label = prof ? prof.label : "guard";
+      if (isBreath) {
+        const breathWord = breathType === "frost" ? "icy blast" : "torrent of dragonfire";
+        logMsg(
+          `You brace behind your <strong>${label}</strong> as the <strong>${enemy.name}</strong> unleashes a ${breathWord}, dealing <strong>${dmg}</strong> damage (reduced).`,
+          "enemy"
+        );
+      } else {
+        logMsg(
+          `You brace behind your <strong>${label}</strong>. The <strong>${enemy.name}</strong> strikes for <strong>${dmg}</strong> damage (reduced).`,
+          "enemy"
+        );
+      }
+
+      // reflect (player only)
+      if (
+        prof &&
+        prof.special &&
+        prof.special.reflectDamage &&
+        enemy.health > 0 &&
+        dmg > 0
+      ) {
+        const maxRef = prof.special.reflectDamage;
+        const ref = randInt(1, maxRef);
+        enemy.health = clamp(enemy.health - ref, 0, enemy.maxHealth);
+        updateEnemyPreview();
+        logMsg(
+          `Power ripples out from your shield, <strong>reflecting ${ref} damage</strong> back to the ${enemy.name}.`,
+          "enemy"
+        );
+        if (enemy.health <= 0) {
+          endCombat(true);
+          return;
+        }
+      }
+    } else {
+      if (isBreath) {
+        const breathWord = breathType === "frost"
+          ? "blast of freezing breath"
+          : "cone of searing flame";
+        logMsg(
+          `The <strong>${enemy.name}</strong> engulfs you in a ${breathWord}, dealing <strong>${dmg}</strong> damage.`,
+          "enemy"
+        );
+      } else {
+        logMsg(
+          `The <strong>${enemy.name}</strong> hits you for <strong>${dmg}</strong> damage.`,
+          "enemy"
+        );
+      }
+    }
+
+    // extra effects from breath on the player
+    if (p.health > 0 && isBreath) {
+      if (breathType === "fire") {
+        const burn = randInt(3, 7);
+        p.health = clamp(p.health - burn, 0, p.maxHealth);
+        logMsg(
+          `Flames cling to your armor, burning you for an additional <strong>${burn}</strong> damage.`,
+          "enemy"
+        );
+      } else if (breathType === "frost") {
+        const drain = randInt(6, 12);
+        p.stamina = clamp(p.stamina - drain, 0, p.maxStamina);
+        logMsg(
+          `The freezing breath saps your strength, draining <strong>${drain}</strong> stamina.`,
+          "enemy"
+        );
+      }
+    }
+
+    if (p.health <= 0) {
+      STATE.combat.playerBlocking = false;
+      STATE.combat.blockProfile = null;
+      onDeath();
+      return;
+    }
+
+  } else {
+    if (!comp) return;
+    comp.health = clamp(comp.health - dmg, 0, comp.maxHealth);
+
+    if (isBreath) {
+      const breathWord = breathType === "frost"
+        ? "blast of freezing breath"
+        : "cone of dragonfire";
+      logMsg(
+        `The <strong>${enemy.name}</strong> engulfs <strong>${comp.name}</strong> in a ${breathWord}, dealing <strong>${dmg}</strong> damage.`,
+        "enemy"
+      );
+    } else {
+      logMsg(
+        `The <strong>${enemy.name}</strong> turns on <strong>${comp.name}</strong>, striking for <strong>${dmg}</strong> damage.`,
+        "enemy"
+      );
+    }
+
+    if (comp.health <= 0) {
+      logMsg(
+        `<strong>${comp.name}</strong> collapses and can no longer fight in this battle!`,
+        "enemy"
+      );
+    }
+  }
+
+  STATE.combat.playerBlocking = false;
+  STATE.combat.blockProfile = null;
+
+  updateBars();
+  saveGame();
+}
+
+function onDeath(){
+  const p=STATE.player,{x,y}=STATE.world;logMsg("<strong>You fall to the frozen ground.</strong> The wilds claim you… but your story is not yet over.","enemy");
+  let lost=Math.round(p.gold*.35);if(p.gold>0&&lost<10)lost=Math.min(10,p.gold);lost=Math.min(lost,p.gold);p.gold-=lost;
+  let lostLvl=false;
+  if(p.level>1){
+    p.level--;lostLvl=true;
+    p.maxHealth=Math.max(100,p.maxHealth-15);p.maxStamina=Math.max(60,p.maxStamina-8);p.maxMagicka=Math.max(50,p.maxMagicka-6);
+  const comp = getActiveCompanion();
+  if (comp && comp.maxHealth != null) {
+    comp.health = comp.maxHealth;
+  }
+    p.xp=0;p.xpToNext=xpForLevel(p.level);
+    if(p.level<7&&p.zone>2)p.zone=2;if(p.level<4&&p.zone>1)p.zone=1;
+  }
+  const nid=nearestCity(x,y)||"whiterun",dest=CITIES[nid];
+  STATE.world.x=dest.x;STATE.world.y=dest.y;STATE.world.currentCity=nid;STATE.world.inCave=false;STATE.world.caveId=null;
+  if(dest.zone)p.zone=dest.zone;
+    p.health=p.maxHealth;p.stamina=p.maxStamina;p.magicka=p.maxMagicka;
+  STATE.combat.inCombat = false;
+  STATE.combat.enemy = null;
+  STATE.combat.playerBlocking = false;
+  STATE.combat.racialUsed = false;
+  STATE.combat.blockProfile = null;
+
+  // 🔹 Reset shout cooldown after death as well
+  p.shoutCooldown = 0;
+
+  genShop(nid);
+  logMsg(`You awaken within the walls of <strong>${dest.name}</strong>, carried there by passing travelers. You lost <strong>${lost}</strong> gold. ${lostLvl?"You have also <strong>lost a level</strong>. ":""}The city is safe, but the wilds will be harsher next time.`,"system");
+  checkEpicQuest(nid);updateBtns();fullUpdate();
+}
+
+function pAttack(){
+  if(!STATE.combat.inCombat) return;
+  tickShoutCooldown();
+  const e = STATE.combat.enemy;
+  const p = STATE.player;
+  const weapon = p.equipment?.weapon || null;
+  const wt = (weapon && weapon.weaponType && WEAPON_TYPES[weapon.weaponType]) ? WEAPON_TYPES[weapon.weaponType] : WEAPON_TYPES.sword;
+
+   const staminaCost = wt.staminaCost != null ? wt.staminaCost : 6;
+
+  // Blizzard makes attacks more tiring
+  let finalStaminaCost = staminaCost;
+  if (STATE.combat && STATE.combat.blizzardActive) {
+    finalStaminaCost = Math.ceil(finalStaminaCost * 1.3); // +30% cost
+  }
+  // Well Rested: cheaper stamina per swing
+  if (STATE.combat && STATE.combat.restedBuff) {
+    finalStaminaCost = Math.ceil(finalStaminaCost * 0.85); // 15% cheaper
+  }
+
+  if (p.stamina < finalStaminaCost) {
+    logMsg("You're too exhausted to attack effectively with your current weapon.","system");
+    return;
+  }
+
+  const traits = getTraitEffects();
+  let critChance = 0.18 + (traits.critBonus || 0);
+  if (wt.critBonus) critChance += wt.critBonus;
+
+  // Base damage from weapon + type multiplier
+  let base = Math.max(4, Math.round(weaponDmg() * (wt.damageMult || 1) + randInt(-2, 2)));
+
+  let crit = false;
+  if (Math.random() < critChance) {
+    crit = true;
+    base = Math.round(base * 1.6);
+  }
+
+  let dmg = base;
+  let glancing = false;
+
+  // Maces: "armor-piercing" – extra vs tougher foes
+  if (wt.armorPierce && e.tier >= 2) {
+    dmg = Math.round(dmg * 1.15);
+  }
+
+  // Greatswords: sometimes a glancing blow
+  if (wt.glanceChance && Math.random() < wt.glanceChance) {
+    glancing = true;
+    dmg = Math.max(1, Math.round(dmg * (wt.glanceMult || 0.7)));
+  }
+  // Shrine blessing: increase your damage this fight
+  if (STATE.combat && STATE.combat.shrineBoost) {
+    dmg = Math.round(dmg * 1.2); // +20% damage
+  }
+
+  p.stamina = clamp(p.stamina - finalStaminaCost, 0, p.maxStamina);
+  e.health = clamp(e.health - dmg, 0, e.maxHealth);
+  
+  updateEnemyPreview();
+
+  const wName = weapon ? weapon.name : "weapon";
+  let msg;
+
+  if (crit) {
+    msg = `You unleash a <strong>critical</strong> strike with your <strong>${wName}</strong>, dealing <strong>${dmg}</strong> damage to the ${e.name}.`;
+  } else {
+    msg = `You strike the ${e.name} with your <strong>${wName}</strong> for <strong>${dmg}</strong> damage.`;
+  }
+
+  if (glancing) {
+    msg += " (The heavy swing goes a little wide, turning it into a glancing blow.)";
+  }
+
+  logMsg(msg, "system");
+
+  // Axes & battleaxes: bleed
+  if (wt.bleedChance && e.health > 0 && Math.random() < wt.bleedChance) {
+    const bleed = randInt(wt.bleedMin || 3, wt.bleedMax || 7);
+    e.health = clamp(e.health - bleed, 0, e.maxHealth);
+    updateEnemyPreview();
+    logMsg(`The wound from your <strong>${wName}</strong> <strong>bleeds</strong> for an additional <strong>${bleed}</strong> damage.`, "system");
+  }
+
+  updateBars();
+
+  if (e.health <= 0) {
+    endCombat(true);
+    return;
+  }
+
+  // Companion acts after your attack
+  if (companionAct()) return;
+
+  // Warhammers: chance to stagger (skip enemy turn)
+  if (wt.staggerChance && Math.random() < wt.staggerChance) {
+    logMsg(`Your heavy blow with the <strong>${wName}</strong> <strong>staggers</strong> the ${e.name}, preventing a counter-attack!`, "enemy");
+    saveGame();
+    return;
+  }
+
+  // Bows / crossbows: sometimes deny counter-attacks by staying at range
+  if (wt.skipCounterChance && Math.random() < wt.skipCounterChance) {
+    logMsg(`You keep your distance with your <strong>${wName}</strong>, denying the ${e.name} a clean counter-attack.`, "enemy");
+    saveGame();
+    return;
+  }
+
+  enemyTurn();
+}
+
+function currentShieldProfile(){
+  const eq = STATE.player.equipment || {};
+  const shield = eq.shield;
+
+  // No shield = generic guarding
+  if (!shield || shield.slot !== "shield") {
+    return {
+      kind: "none",
+      label: "guard",
+      blockBonus: 0.18,  // small extra reduction when blocking bare-armed
+      staminaCost: 4,
+      special: null
+    };
+  }
+
+  const kind = shield.shieldType || "light";
+  let blockBonus, staminaCost, label;
+
+  if (kind === "heavy") {
+    // Heavy: more damage blocked, costs more stamina
+    blockBonus = shield.blockBonus != null ? shield.blockBonus : 0.32;
+    staminaCost = shield.staminaCost != null ? shield.staminaCost : 6;
+    label = "heavy shield";
+  } else if (kind === "unique") {
+    // Unique: use item values, slightly stronger by default
+    blockBonus = shield.blockBonus != null ? shield.blockBonus : 0.36;
+    staminaCost = shield.staminaCost != null ? shield.staminaCost : 5;
+    label = "unique shield";
+  } else {
+    // Light: cheaper stamina, weaker block
+    blockBonus = shield.blockBonus != null ? shield.blockBonus : 0.22;
+    staminaCost = shield.staminaCost != null ? shield.staminaCost : 3;
+    label = "light shield";
+  }
+
+  return {
+    kind,
+    label,
+    blockBonus,
+    staminaCost,
+    special: shield.special || null
+  };
+}
+
+function pBlock(){
+  if (!STATE.combat.inCombat) return;
+  tickShoutCooldown();
+  const p = STATE.player;
+  const prof = currentShieldProfile();
+  let cost = prof.staminaCost;
+
+  // Blizzard makes it harder to hold your guard
+  if (STATE.combat && STATE.combat.blizzardActive) {
+    cost = Math.ceil(cost * 1.3); // +30% cost
+  }
+
+  if (p.stamina < cost) {
+    logMsg("You're too exhausted to properly raise your guard.","system");
+    return;
+  }
+
+  STATE.combat.playerBlocking = true;
+  STATE.combat.blockProfile = prof;
+  p.stamina = clamp(p.stamina - cost, 0, p.maxStamina);
+
+  let text;
+  if (prof.kind === "heavy") {
+    text = "You plant your feet and raise your heavy shield, bracing for the impact.";
+  } else if (prof.kind === "unique") {
+    text = "You bring your unique shield to bear, its strange surface humming with hidden power.";
+  } else if (prof.kind === "light") {
+    text = "You snap your light shield up, ready to deflect the next blow.";
+  } else {
+    text = "You raise your arms in a guarded stance, trying to catch the next strike.";
+  }
+
+  logMsg(text,"system");
+  updateBars();
+  enemyTurn();
+}
+
+function currentSpellStats(){
+  const ps=STATE.player.spells||{known:[],equipped:null};
+  const eqId=ps.equipped;if(!eqId||!SPELLS[eqId])return null;
+  const def=SPELLS[eqId];
+  const entry=ps.known.find(s=>s.id===eqId)||{id:eqId,rarity:"common"};
+  const r=entry.rarity||"common";
+  const mult=RARITY_DMG[r]||1,cMult=RARITY_COST[r]||1,mRank=STATE.player.skills?.mage||0;
+  const skillMult=1+0.08*mRank;
+  const traits=getTraitEffects(),spellMult=traits.spellMult||1;
+  const dmgMin=Math.round(def.minDamage*mult*skillMult*spellMult),dmgMax=Math.round(def.maxDamage*mult*skillMult*spellMult);
+  const cost=Math.round(def.baseCost*cMult);
+  return {def,rarity:r,dmgMin,dmgMax,cost};
+}
+
+function pCast(){
+  if(!STATE.combat.inCombat)return;
+  tickShoutCooldown();
+  const stats=currentSpellStats();if(!stats){logMsg("You reach for power, but know no spells to cast.","system");return}
+  const p=STATE.player,e=STATE.combat.enemy;
+  if(p.magicka<stats.cost){logMsg("You reach for magicka, but the well runs dry.","system");return}
+  p.magicka=clamp(p.magicka-stats.cost,0,p.maxMagicka);
+    let d = randInt(stats.dmgMin, stats.dmgMax);
+
+  // Shrine blessing also empowers your spells
+  if (STATE.combat && STATE.combat.shrineBoost) {
+    d = Math.round(d * 1.2); // +20% damage
+  }
+  // NEW: simple elemental interactions
+  const elem = stats.def && stats.def.element;    // e.g. "fire", "frost", "shock"
+  const enemyElem = e.element;                    // some enemies already have an element
+
+  if (elem && enemyElem) {
+    // Fire strong vs frost, frost strong vs fire
+    if (elem === "fire" && enemyElem === "frost") {
+      d = Math.round(d * 1.25);
+    } else if (elem === "frost" && enemyElem === "fire") {
+      d = Math.round(d * 1.25);
+    }
+    // Same element → partial resistance
+    else if (elem === enemyElem) {
+      d = Math.round(d * 0.75);
+    }
+  }
+
+  e.health = clamp(e.health - d, 0, e.maxHealth);
+  updateEnemyPreview();
+
+  const lab=R_LABEL[stats.rarity]||"Common";
+   logMsg(`You cast <strong>${stats.def.name}</strong> (${lab}), blasting the ${e.name} for <strong>${d}</strong> damage.`,"system");
+
+  updateBars();
+  if(e.health<=0){
+    endCombat(true);
+    return;
+  }
+
+  // Companion follows up after your spell
+  if (companionAct()) return;
+
+  enemyTurn();
+}
+
+function pPotion(){
+  if(!STATE.combat.inCombat)return;
+  tickShoutCooldown();const type=STATE.player.selectedPotion||"health",p=STATE.player.potions;
+  if(!p[type]){logMsg(`You fumble for a ${type} potion, but your satchel is empty.`,"system");return}
+  const traits=getTraitEffects(),potMult=1+(traits.potionBonus||0);
+  p[type]--;let amt;
+  if(type==="health"){
+    amt=Math.round(randInt(25,40)*potMult);STATE.player.health=clamp(STATE.player.health+amt,0,STATE.player.maxHealth);
+    logMsg(`You drink a <strong>health potion</strong>, restoring <strong>${amt}</strong> health.`,"system");
+  }else if(type==="stamina"){
+    amt=Math.round(randInt(25,40)*potMult);STATE.player.stamina=clamp(STATE.player.stamina+amt,0,STATE.player.maxStamina);
+    logMsg(`You drink a <strong>stamina potion</strong>, restoring <strong>${amt}</strong> stamina.`,"system");
+  }else{
+    amt=Math.round(randInt(25,40)*potMult);STATE.player.magicka=clamp(STATE.player.magicka+amt,0,STATE.player.maxMagicka);
+    logMsg(`You drink a <strong>magicka potion</strong>, restoring <strong>${amt}</strong> magicka.`,"system");
+  }
+  fullUpdate();enemyTurn();
+}
+
+function logCompanionShoutReaction(shoutId, level){
+  const comp = getActiveCompanion && getActiveCompanion();
+  if (!comp || comp.id !== "lydia") return;
+  if (Math.random() > 0.45) return; // ~45% chance to speak
+
+  let line = null;
+
+  switch(shoutId){
+    case "fus":
+      line = `"Remind me not to stand in front of you when you do that."`;
+      break;
+    case "fire":
+      line = `"That's one way to warm up the mountain air."`;
+      break;
+    case "storm":
+      line = `"By the Eight… the very sky answers you."`;
+      break;
+    case "slow":
+      line = `"Everything just... stopped. I’ll never get used to that."`;
+      break;
+    default:
+      line = `"I'll stay behind you. Your voice is... impressive."`;
+  }
+
+  if (line){
+    logMsg(`<span class="inventory-meta"><strong>${comp.name}</strong>: ${line}</span>`,"system");
+  }
+}
+
+function logEnemyReaction(shoutId, enemy){
+  if (!enemy) return;
+  const g = enemy.group || "";
+  const id = enemy.id || "";
+
+  if (shoutId === "fus"){
+    if (g === "Dragon"){
+      logMsg(`The <strong>${enemy.name}</strong> reels in mid-air, wings thrashing against the force of your Thu'um.`, "enemy");
+    } else if (g === "Undead"){
+      logMsg(`Ancient bones clatter as the <strong>${enemy.name}</strong> crashes back under the impact.`, "enemy");
+    }
+  }
+
+  if (shoutId === "fire"){
+    if (g === "Undead"){
+      logMsg(`The <strong>${enemy.name}</strong> blackens and cracks, the fire hungrily devouring dead flesh.`, "enemy");
+    }
+  }
+
+  if (shoutId === "frost"){
+    if (g === "Dragon"){
+      logMsg(`Frost crusts over the <strong>${enemy.name}</strong>'s scales, slowing its movements.`, "enemy");
+    }
+  }
+
+  if (shoutId === "storm" && g === "Dwarven Automaton"){
+    logMsg(`Lightning dances across the <strong>${enemy.name}</strong>, gears screaming as metal warps and sparks.`, "enemy");
+  }
+}
+
+function useShout(){
+  const p = STATE.player;
+
+  if (p.shoutCooldown > 0){
+    logMsg(`Your Thu'um is still recharging (${p.shoutCooldown} turn(s)).`,"system");
+    return;
+  }
+  if (!STATE.combat.inCombat){
+    logMsg("You can only use your Thu'um when confronted by an enemy.","system");
+    return;
+  }
+
+  const id = p.shouts && p.shouts.equipped;
+  if(!id || !SHOUTS[id]){
+    logMsg("You draw in breath, but no Thu'um answers. (No shout equipped)","system");
+    return;
+  }
+
+  const def = SHOUTS[id];
+  const e   = STATE.combat.enemy;
+  if(!e){
+    logMsg("No foe stands before you.","system");
+    return;
+  }
+
+  const level = (p.shouts.levels && p.shouts.levels[id]) || 1;
+
+  // Fancy Thu'um banner in the log
+  const wordsLine = shoutWordsLine(id, level);
+  if (wordsLine){
+    logMsg(
+      `<div class="thu-um-line">${wordsLine}</div>`,
+      "system"
+    );
+  }
+
+  let ended = false; // if true, we skip enemyTurn()
+
+  // --- SHOUT LOGIC ---
+  switch(id){
+
+    // Unrelenting Force
+    case "fus": {
+      let d = randInt(18,30) * (1 + 0.35*(level-1));
+      // Dragons slightly resist brute force, light foes get wrecked
+      if (e.group === "Dragon") d = Math.round(d * 0.8);
+      if (e.group === "Humanoid" || e.group === "Undead") d = Math.round(d * 1.1);
+
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You unleash <strong>${def.name}</strong>, hurling the ${e.name} back with <strong>${d}</strong> force damage!`,
+        "system"
+      );
+      logEnemyReaction(id, e);
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if (e.health <= 0){ endCombat(true); ended = true; }
+      else if (Math.random() < 0.6){
+        logMsg(`The ${e.name} is <strong>staggered</strong> and cannot act this turn!`,"enemy");
+        ended = true;
+      }
+      break;
+    }
+
+    // Fire Breath
+    case "fire": {
+      let d = randInt(18,30) * (1 + 0.35*(level-1));
+
+      // Fire resist/weakness
+      if (e.element === "fire" || e.group === "Dragon"){
+        d = Math.round(d * 0.7); // dragons / fire creatures resist
+        logMsg(`<span class="inventory-meta">The ${e.name} resists some of the flames.</span>`, "enemy");
+      } else if (e.group === "Undead" || e.id === "troll" || e.id === "ice_wraith"){
+        d = Math.round(d * 1.25);
+        logMsg(`<span class="inventory-meta">Fire bites deeper into this foe.</span>`, "enemy");
+      }
+
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You shout <strong>${def.name}</strong>, engulfing the ${e.name} in flame for <strong>${d}</strong> fire damage!`,
+        "system"
+      );
+      logEnemyReaction(id, e);
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if (e.health <= 0){ endCombat(true); ended = true; }
+      break;
+    }
+
+    // Frost Breath
+    case "frost": {
+      let d = randInt(18,30) * (1 + 0.35*(level-1));
+
+      if (e.element === "frost" || e.id === "frost_atronach"){
+        d = Math.round(d * 0.7);
+        logMsg(`<span class="inventory-meta">The ${e.name} shrugs off much of the cold.</span>`, "enemy");
+      } else if (e.group === "Dragon" && e.element === "fire"){
+        d = Math.round(d * 1.2);
+        logMsg(`<span class="inventory-meta">The icy blast bites hard into fiery scales.</span>`, "enemy");
+      }
+
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You exhale <strong>${def.name}</strong>, chilling the ${e.name} for <strong>${d}</strong> frost damage.`,
+        "system"
+      );
+      logEnemyReaction(id, e);
+      logCompanionShoutReaction(id, level);
+      updateBars();
+
+      if(e.health <= 0){
+        endCombat(true); ended = true; break;
+      }
+
+      // Weaken their attacks for one turn
+      const oMin=e.minDamage,oMax=e.maxDamage;
+      e.minDamage=Math.max(1,Math.round(e.minDamage*0.5));
+      e.maxDamage=Math.max(2,Math.round(e.maxDamage*0.6));
+      enemyTurn();
+      e.minDamage=oMin;e.maxDamage=oMax;
+      ended = true;
+      break;
+    }
+
+    // Clear Skies
+    case "clear": {
+      const hadBlizzard = !!p.tempBlizzard || (STATE.combat && STATE.combat.blizzardActive);
+      p.tempBlizzard = 0;
+      if(STATE.combat) STATE.combat.blizzardActive = false;
+
+      const gainS = randInt(8,16);
+      const gainM = randInt(6,12);
+      p.stamina = clamp(p.stamina + gainS, 0, p.maxStamina);
+      p.magicka = clamp(p.magicka + gainM, 0, p.maxMagicka);
+
+      logMsg(
+        `<strong>${def.name}</strong> tears the clouds apart, sweeping away hostile weather.` +
+        (hadBlizzard ? `<br><span class="inventory-meta">The blizzard's grip on you fades.</span>` : "") +
+        `<br><span class="inventory-meta">You feel renewed (+${gainS} stamina, +${gainM} magicka).</span>`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      ended = true;
+      break;
+    }
+
+    // Become Ethereal
+    case "ethereal": {
+      const gain = randInt(10,18);
+      p.stamina = clamp(p.stamina + gain, 0, p.maxStamina);
+      logMsg(
+        `You become <strong>Ethereal</strong>, your form ghost-like and untouchable. (+${gain} stamina)`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      ended = true;
+      break;
+    }
+
+    // Whirlwind Sprint
+    case "wstep": {
+      logMsg(`You roar <strong>${def.name}</strong> and hurl yourself forward in a blur.`, "system");
+      logCompanionShoutReaction(id, level);
+      if(Math.random()<0.8){
+        endCombat(false);
+        ended=true;
+      }else{
+        logMsg(`You overshoot your mark and the ${e.name} cuts you off!`,"enemy");
+      }
+      break;
+    }
+
+    // Aura Whisper
+    case "aura": {
+      markSeen(e.id);
+      let d = randInt(10,18) * (1 + 0.25*(level-1));
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You breathe <strong>${def.name}</strong>, the life force of the ${e.name} glowing in your mind's eye. (<strong>${d}</strong> damage)`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+
+    // Animal Allegiance
+    case "animal": {
+      const d = randInt(10,18);
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      const comp = getActiveCompanion();
+      let extra = "";
+      if(comp){
+        const heal = randInt(8,14);
+        comp.health = clamp(comp.health + heal, 0, comp.maxHealth);
+        extra = `<br><span class="inventory-meta">Wild beasts circle with ${comp.name}, giving them +${heal} health.</span>`;
+      }
+      logMsg(
+        `You call <strong>${def.name}</strong>; unseen beasts harry the ${e.name} for <strong>${d}</strong> damage.` +
+        extra,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+
+    // Disarm
+    case "disarm": {
+      const d = randInt(8,14);
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You cry <strong>${def.name}</strong>, ripping the ${e.name}'s grip from its weapon and dealing <strong>${d}</strong> damage. It scrambles to recover and cannot counter this turn.`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if(e.health<=0){endCombat(true);ended=true;break;}
+      ended=true; // skip enemyTurn
+      break;
+    }
+
+    // Marked for Death
+    case "mark": {
+      const d = randInt(10,16);
+      const bleed = randInt(6,10);
+      e.health = clamp(e.health - d - bleed, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You carve <strong>${def.name}</strong> into the air. The ${e.name} takes <strong>${d}</strong> damage now and <strong>${bleed}</strong> more as its strength bleeds away.`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+
+    // Slow Time
+    case "slow": {
+      logMsg(
+        `You shout <strong>${def.name}</strong>. To you, the ${e.name}'s movements crawl at a snail's pace; you easily avoid its next strike.`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      ended=true;
+      break;
+    }
+
+    // Storm Call
+    case "storm": {
+      let d = randInt(18,30) * (1 + 0.35*(level-1));
+      if(e.group==="Dwarven Automaton") d += randInt(6,10);
+      if(e.id === "storm_atronach"){
+        d = Math.round(d * 0.7);
+        logMsg(`<span class="inventory-meta">The storm atronach drinks in some of the lightning.</span>`,"enemy");
+      }
+
+      e.health = clamp(e.health - d, 0, e.maxHealth);
+      updateEnemyPreview();
+      logMsg(
+        `You roar <strong>${def.name}</strong> and the sky answers with lightning, blasting the ${e.name} for <strong>${d}</strong> shock damage.`,
+        "system"
+      );
+      logEnemyReaction(id, e);
+      logCompanionShoutReaction(id, level);
+      updateBars();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+
+    // Throw Voice
+    case "throw": {
+      logMsg(
+        `You use <strong>${def.name}</strong>, your voice echoing from a distant rockface and drawing the ${e.name}'s attention away.`,
+        "system"
+      );
+      logCompanionShoutReaction(id, level);
+      if(Math.random()<0.7){
+        endCombat(false);
+        ended=true;
+      }else{
+        logMsg(`The ${e.name} quickly realizes the trick and turns back toward you!`,"enemy");
+      }
+      break;
+    }
+
+    default:
+      logMsg("You shout, but nothing special happens.","system");
+  }
+
+  // Base cooldown: fewer turns at higher word level
+  let cd = 3 + (3 - level); // 5 / 4 / 3
+  if (cd < 1) cd = 1;
+  p.shoutCooldown = cd;
+
+  // Rare Shout Echo – 5% chance to reset cooldown
+  if (STATE.combat.inCombat && Math.random() < 0.05){
+    p.shoutCooldown = 0;
+    logMsg(
+      `<span class="inventory-meta" style="color:#6cf;">Your Thu'um <strong>echoes</strong> through the mountains – the cooldown refreshes!</span>`,
+      "system"
+    );
+  }
+
+ // 🔹 update the Shout button text after setting cooldown
+  updateShoutButtonLabel();
+
+  if(!ended && STATE.combat.inCombat){
+    enemyTurn();
+  }
+  saveGame();
+}
+
+function useRacePower(){
+  if(!STATE.combat.inCombat){
+  tickShoutCooldown();
+    logMsg("You can only use your racial power in combat.","system");
+    return;
+  }
+  if(STATE.combat.racialUsed){
+    logMsg("You have already used your racial power in this fight.","system");
+    return;
+  }
+  const raceId=STATE.player.raceId;
+  if(!raceId){
+    logMsg("You haven't chosen a race yet.","system");
+    return;
+  }
+  const p=STATE.player,e=STATE.combat.enemy;
+  if(!e){
+    logMsg("No foe stands before you.","system");
+    return;
+  }
+  STATE.combat.racialUsed=true;
+  let ended=false;
+  switch(raceId){
+    case "argonian":{
+      const heal=Math.round(p.maxHealth*0.5);
+      p.health=clamp(p.health+heal,0,p.maxHealth);
+      logMsg(`You call upon <strong>Histskin</strong>, rapidly knitting your wounds for <strong>${heal}</strong> health.`,"system");
+      updateBars();
+      break;
+    }
+    case "breton":{
+      const gain=Math.round(p.maxMagicka*0.5);
+      p.magicka=clamp(p.magicka+gain,0,p.maxMagicka);
+      logMsg(`You invoke <strong>Dragonskin</strong>, drawing ambient magicka into yourself (+<strong>${gain}</strong> magicka).`,"system");
+      updateBars();
+      break;
+    }
+    case "dunmer":{
+      const d=randInt(20,35);
+      e.health=clamp(e.health-d,0,e.maxHealth);
+      logMsg(`Flames erupt around you as <strong>Ancestor's Wrath</strong> scorches the ${e.name} for <strong>${d}</strong> fire damage.`,"system");
+      updateEnemyPreview();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+    case "altmer":{
+      const gain=Math.round(p.maxMagicka*0.7);
+      p.magicka=clamp(p.magicka+gain,0,p.maxMagicka);
+      logMsg(`You slip into a <strong>Highborn</strong> trance, your magicka surging by <strong>${gain}</strong>.`,"system");
+      updateBars();
+      break;
+    }
+    case "imperial":{
+      logMsg(`You speak with the <strong>Voice of the Emperor</strong>, calming the ${e.name} and ending the clash.`,"system");
+      endCombat(false);ended=true;
+      break;
+    }
+    case "khajiit":{
+      const d=randInt(18,32);
+      e.health=clamp(e.health-d,0,e.maxHealth);
+      logMsg(`You leap forward with <strong>Khajiit claws</strong>, raking the ${e.name} for <strong>${d}</strong> damage.`,"system");
+      updateEnemyPreview();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+    case "nord":{
+      logMsg(`You unleash a fearsome <strong>Battle Cry</strong>, sending the ${e.name} fleeing into the snow.`,"system");
+      endCombat(false);ended=true;
+      break;
+    }
+    case "orsimer":{
+      const d=randInt(22,36);
+      e.health=clamp(e.health-d,0,e.maxHealth);
+      const heal=Math.round(p.maxHealth*0.2);
+      p.health=clamp(p.health+heal,0,p.maxHealth);
+      logMsg(`You enter <strong>Berserker Rage</strong>, dealing <strong>${d}</strong> brutal damage and shrugging off your own wounds (+<strong>${heal}</strong> health).`,"system");
+      updateBars();updateEnemyPreview();
+      if(e.health<=0){endCombat(true);ended=true;}
+      break;
+    }
+    case "redguard":{
+      const gain=Math.round(p.maxStamina*0.8);
+      p.stamina=clamp(p.stamina+gain,0,p.maxStamina);
+      logMsg(`Your blood surges with <strong>Adrenaline Rush</strong>, restoring <strong>${gain}</strong> stamina.`,"system");
+      updateBars();
+      break;
+    }
+    case "bosmer":{
+      logMsg(`You call on <strong>Command Animal</strong>, nearby beasts harrying the ${e.name} long enough for you to slip away.`,"system");
+      endCombat(false);ended=true;
+      break;
+    }
+    default:
+      logMsg("You attempt to call upon a racial power, but nothing answers.","system");
+  }
+  if(!ended && STATE.combat.inCombat){
+    enemyTurn();
+  }
+  saveGame();
+}
+
+function tryEscape(){
+  if(!STATE.combat.inCombat)return;
+  tickShoutCooldown();
+  const p=STATE.player,thief=STATE.player.skills?.thief||0;
+  const traits=getTraitEffects();
+  let ch=.45+(p.stamina/p.maxStamina)*.3+0.04*thief;
+  ch+=traits.escapeBonus||0;
+  ch=Math.min(.9,ch);
+  Math.random()<ch?endCombat(false):(logMsg(`You try to slip away, but the ${STATE.combat.enemy.name} cuts off your escape!`,"enemy"),enemyTurn());
+}
+
+function equipShout(id){
+  if(!SHOUTS[id]) return;
+  STATE.player.shouts.equipped = id;
+  logMsg(`You ready the shout <strong>${SHOUTS[id].name}</strong>.`,"system");
+  updateShouts();
+  updateBtns();
+  updateShoutButtonLabel();
+  saveGame();
+}
+
+function genShop(id){
+  const z=STATE.player.zone,it=[],c=4+randInt(0,2);for(let i=0;i<c;i++){
+    const item=makeLoot(z);const price=item.value?Math.round(item.value*1.35):20;it.push({...item,price});
+  }
+  STATE.shop.items=it;
+}
+
+ 
+function fastTravel(id){
+  if (STATE.combat.inCombat){
+    logMsg("You cannot fast travel while enemies are nearby.","system");
+    return;
+  }
+
+  if (STATE.world.inCave){
+    logMsg("You cannot fast travel from deep within a cave. Find your way back outside first.","system");
+    return;
+  }
+
+  const d = CITIES[id];
+  if (!d) return;
+
+  STATE.world.x = d.x;
+  STATE.world.y = d.y;
+  if (d.zone) STATE.player.zone = d.zone;
+
+  STATE.world.currentCity   = id;
+  STATE.world.inCave        = false;
+  STATE.world.caveId        = null;
+  STATE.world.lastCityEvent = null;
+  STATE.world.timeOfDayIndex =
+    (STATE.world.timeOfDayIndex + randInt(1,3)) % TIMES.length;
+
+  // Any fast travel kicks you out of the black market
+  exitBlackMarketMode();
+
+  // Generate normal city shop stock
+  genShop(id);
+
+  logMsg(
+    `You arrive in <strong>${d.name}</strong>, the heart of <strong>${d.hold}</strong>. Within its walls you are safe from attack.`,
+    "event"
+  );
+
+  // Extra flavour when you arrive in Riften
+  if (id === "riften"){
+    logMsg(
+      `<span class="inventory-meta">In Riften's alleys, whispers speak of a hidden <strong>black market</strong>. ` +
+      `If you know the right people, you might trade there.</span>`,
+      "system"
+    );
+  }
+
+  triggerCityEvent(id);
+  checkEpicQuest(id);   // we have a cityId param on checkEpicQuest
+  updateWorldUI();
+  updateMarker();
+  updateScene();
+  updateBars();
+  updateBtns();
+  fullUpdate();
+  saveGame();
+}
+
+function setupFastTravel(){document.querySelectorAll(".map-locations span[data-loc]").forEach(s=>s.onclick=()=>fastTravel(s.dataset.loc))}
+
+function updateWorldUI(){
+  // Currently fastTravel also calls updateScene() and updateMarker() directly,
+  // so this can stay light. If you want to add extra world HUD updates later,
+  // you can put them here.
+}
+
+function triggerCityEvent(id){
+  const c = CITIES[id];
+  if(!c){
+    STATE.world.lastCityEvent = null;
+    return;
+  }
+
+  const r = Math.random();
+  const p = STATE.player;
+  let evt = null;
+  let msg = "";
+
+  // ~1/3: small temple blessing (heal)
+  if (r < 0.33) {
+    evt = { icon:"✧", short:"Temple blessing" };
+    const heal = 20;
+    p.health = Math.min(p.maxHealth, p.health + heal);
+    msg = `At the temple in <strong>${c.name}</strong>, a priest anoints you. ` +
+          `You feel renewed, recovering <strong>${heal} Health</strong>.`;
+  }
+
+  // ~1/3: travelling merchant, small gold
+  else if (r < 0.66) {
+    evt = { icon:"⛁", short:"Travelling merchant" };
+    const g = randInt(10,25);
+    p.gold += g;
+    msg = `A travelling merchant sets up a stall in <strong>${c.name}</strong>. ` +
+          `You help unload crates and earn <strong>${g} gold</strong>.`;
+  }
+
+  // ~1/3: tavern rumours (flavour only)
+  else {
+    evt = { icon:"☉", short:"Tavern rumours" };
+    msg = `In a smoky tavern, locals trade <strong>rumours of trouble</strong> in the wilds beyond ${c.name}.`;
+  }
+
+  // Store the event
+  STATE.world.lastCityEvent = evt;
+
+  // Log the event
+  logMsg(msg, "event");
+
+  // Reputation changes ONLY if evt exists
+  if (evt) {
+    if (evt.short === "Temple blessing") {
+      adjustReputation(id, 1);
+    }
+    else if (evt.short === "Travelling merchant") {
+      adjustReputation(id, 1);
+    }
+  }
+}
+
+function mineOres(){
+  const r=STATE.resources,z=STATE.player.zone;let parts=[];const nodes=1+randInt(0,2);
+  const cave=STATE.world.inCave&&STATE.world.caveId?CAVE_BY_ID[STATE.world.caveId]:null;
+  for(let i=0;i<nodes;i++){
+    const roll=Math.random();let o=null;
+    if(cave){
+      const odef=cave.ore||{},pFe=odef.iron||0,pCu=pFe+(odef.copper||0),pAu=pCu+(odef.gold||0),pOn=pAu+(odef.onyx||0);
+      if(roll<pFe)o="iron";else if(roll<pCu)o="copper";else if(roll<pAu)o="gold";else if(roll<pOn)o="onyx";if(!o)o="iron";
+    }else{
+      if(z===1){if(roll<.8)o="iron";else if(roll<.95)o="copper";else o="gold";}
+      else if(z===2){if(roll<.5)o="iron";else if(roll<.85)o="copper";else o="gold";}
+      else{if(roll<.35)o="copper";else if(roll<.7)o="gold";else o="onyx";}
+    }
+    if(o==="iron"){r.ironOre++;parts.push("iron ore")}
+    else if(o==="copper"){r.copperOre++;parts.push("copper ore")}
+    else if(o==="gold"){r.goldOre++;parts.push("gold ore")}
+    else if(o==="onyx"){r.onyx++;parts.push("a shard of onyx")}
+  }
+  if(!parts.length)parts.push("only worthless rock");
+  logMsg(`You pause to mine the cave walls, uncovering <strong>${parts.join(", ")}</strong>.`,"loot");
+  fullUpdate();
+}
+
+function pickCaveForZone(z){
+  const pool=CAVES.filter(c=>c.zone<=z);if(!pool.length)return CAVES[0];return pool[randInt(0,pool.length-1)];
+}
+
+function triggerTravelEvent() {
+    const roll = Math.random();
+
+    // 1) AMBUSH (30% of all travel events)
+    if (roll < 0.30) {
+        logMsg(`<strong>Ambush!</strong> Hidden foes leap from the shadows and strike!`, "event");
+        startCombat(); // immediate fight
+        return;
+    }
+
+    // 2) BLIZZARD (25%)
+    if (roll < 0.55) {
+        logMsg(
+            `<span style="color:#99d;">A raging blizzard engulfs the land...</span><br>
+             <span class="inventory-meta">Visibility drops, and your stamina struggles against the cold.</span>`,
+            "event"
+        );
+
+        // Apply temporary debuff for next 1–2 combats
+        STATE.player.tempBlizzard = 2; 
+        return;
+    }
+
+    // 3) MERCHANT CARAVAN (25%)
+    if (roll < 0.80) {
+        logMsg(
+            `<strong>A Khajiit merchant caravan appears!</strong><br>
+             <span class="inventory-meta">They offer goods and will buy your items at fair prices.</span>`,
+            "event"
+        );
+
+        STATE.world.caravan = true;
+        return;
+    }
+
+    // 4) ANCIENT SHRINE (20%)
+    logMsg(
+        `<span style="color:#ffe680;">You discover an ancient shrine.</span><br>
+         <span class="inventory-meta">A warm light blesses you, empowering your next battles.</span>`,
+        "event"
+    );
+
+    STATE.player.tempShrineBuff = 3; // lasts for 3 combats
+}
+
+function explore(){
+  // Random overworld dragon encounter (not in a cave)
+  if (!STATE.world.inCave && Math.random() < 0.05){ // 5% chance
+    const base = ENEMIES.find(e => e.id === "dragon");
+    if (base) {
+      const dragon = { ...base, health: base.maxHealth };
+
+      STATE.combat.enemy         = dragon;
+      STATE.combat.inCombat      = true;
+      STATE.combat.playerBlocking = false;
+      STATE.combat.racialUsed     = false;
+      STATE.combat.blockProfile   = null;
+      STATE.combat.blizzardActive = false;
+      STATE.combat.shrineBoost    = false;
+
+      logMsg(`<strong>A DRAGON descends from the clouds!</strong>`,"enemy");
+
+      updateEnemyPreview();
+      updateScene();
+      updateBtns();
+      fullUpdate();
+    }
+    return;
+  }
+
+  if (STATE.combat.inCombat) return;
+  // --- CAVE EXPLORATION ---
+  if (STATE.world.inCave && STATE.world.caveId) {
+    STATE.world.timeOfDayIndex = (STATE.world.timeOfDayIndex + 1) % TIMES.length;
+    const cave = CAVE_BY_ID[STATE.world.caveId];
+
+    const r = Math.random();
+
+    if (r < 0.5) {
+      // Go deeper → fight (chance for cave boss handled in startCombat)
+      let deeperMsg = "You push deeper into the echoing tunnels…";
+      if (cave && cave.bossId) {
+        deeperMsg += `<br><span class="inventory-meta" style="color:#ff4444;">
+          Something ancient stirs in the darkness…
+        </span>`;
+      }
+      logMsg(deeperMsg, "event");
+      startCombat();
+    } else if (r < 0.85) {
+      // Mine ores
+      mineOres();
+    } else {
+      // Find a way out
+      STATE.world.inCave = false;
+      STATE.world.caveId = null;
+      logMsg(
+        "You follow faint currents of cold air and eventually find your way back to the surface.",
+        "event"
+      );
+      fullUpdate();
+    }
+    return;
+  }
+
+  // --- OVERWORLD TRAVEL EVENTS (10% per explore) ---
+  if (!STATE.combat.inCombat && Math.random() < 0.10) {
+    triggerTravelEvent();
+    // Ambush may have started combat; if so, don't move further this turn
+    if (STATE.combat.inCombat) {
+      fullUpdate();
+      return;
+    }
+  }
+
+  // --- NORMAL OVERWORLD EXPLORATION ---
+  if (inCity()) {
+    const c = CITIES[STATE.world.currentCity];
+    const n = c ? c.name : "the city";
+    logMsg(
+      `You leave the safety of <strong>${n}</strong> and head back into the wilds.`,
+      "event"
+    );
+    STATE.world.currentCity = null;
+  }
+
+  // Step on the map
+  const d = randInt(0, 3);
+  if (d === 0) STATE.world.y++;
+  else if (d === 1) STATE.world.y--;
+  else if (d === 2) STATE.world.x++;
+  else STATE.world.x--;
+
+  STATE.world.timeOfDayIndex =
+    (STATE.world.timeOfDayIndex + 1) % TIMES.length;
+  updateScene();
+  updateMarker();
+
+  // Chance to discover a cave entrance
+  if (Math.random() < 0.18) {
+    const cave = pickCaveForZone(STATE.player.zone);
+    STATE.world.inCave = true;
+    STATE.world.caveId = cave.id;
+
+    let msg =
+      `In the side of a frozen cliff you spot the entrance to <strong>${cave.name}</strong>. ` +
+      `You light a torch and step inside.`;
+
+    if (cave.bossId) {
+      msg += `<br><span class="inventory-meta" style="color:#ffcc66;">
+        You feel a <strong>powerful presence</strong> deeper within this cave…
+      </span>`;
+    }
+
+    logMsg(msg, "event");
+    fullUpdate();
+    return;
+  }
+
+  // Normal overworld outcomes (fight / satchel / flavour event)
+  const r2 = Math.random();
+  if (r2 < 0.55) {
+    let deeperMsg = "You push deeper into the echoing tunnels…";
+
+const cave = CAVE_BY_ID[STATE.world.caveId];
+if (cave && cave.bossId) {
+  deeperMsg += `<br><span class="inventory-meta" style="color:#88f;">
+  You hear distant chanting… ancient words echo through the stone.
+  </span>`;
+}
+
+logMsg(deeperMsg, "event");
+    startCombat();
+  } else if (r2 < 0.8) {
+    const traits = getTraitEffects(),
+      goldMult = 1 + (traits.goldBonus || 0);
+    let g = randInt(3, 14) * STATE.player.zone;
+    g = Math.round(g * goldMult);
+    STATE.player.gold += g;
+    const p = STATE.player.potions;
+    let extra = "";
+    const roll = Math.random();
+    if (roll < 0.5) {
+      p.health++;
+      extra = " and a <strong>health potion</strong>";
+    } else if (roll < 0.75) {
+      p.stamina++;
+      extra = " and a <strong>stamina potion</strong>";
+    } else {
+      p.magicka++;
+      extra = " and a <strong>magicka potion</strong>";
+    }
+    logMsg(
+      `You discover an old satchel in the snow. Inside: <strong>${g}</strong> gold${extra}.`,
+      "loot"
+    );
+    fullUpdate();
+  } else {
+    const ev = [
+      "You glimpse distant lanterns along a mountain road. Voices drift on the wind, then fade.",
+      "You pass a stone shrine, half-buried in ice. Someone has left a fresh offering.",
+      "A dragon's roar echoes across the peaks. The sound turns your blood to ice.",
+      "You find old cart tracks in the snow. Whatever passed through here was in a hurry."
+    ];
+    logMsg(ev[randInt(0, ev.length - 1)], "event");
+    fullUpdate();
+  }
+}
+
+function temple(){
+  exitBlackMarketMode();
+  if(!inCity()){logMsg("You must be in a city to visit a temple.","system");return}
+  if(STATE.combat.inCombat)return;const cost=25,p=STATE.player;
+  if(p.gold<cost){logMsg(`You offer a prayer, but lack the <strong>${cost} gold</strong> tithe the priests request.`,"system");return}
+  p.gold-=cost;p.health=p.maxHealth;p.stamina=p.maxStamina;p.magicka=p.maxMagicka;
+  const comp = getActiveCompanion();
+  if (comp && comp.maxHealth != null) {
+    comp.health = comp.maxHealth;
+  }
+  logMsg(`Incense fills the air as the priests lay hands upon you. You are <strong>fully restored</strong> for <strong>${cost} gold</strong>.`,"system"); 
+ // NEW: Well Rested style buff for a few fights
+  STATE.player.tempRestedBuff = 3; // next 3 combats 
+logMsg("You leave the temple feeling well-rested. For your next few battles, attacking and blocking cost less stamina.","system");
+fullUpdate();
+}
+
+function trainer(){
+  exitBlackMarketMode();
+  if(!inCity()){logMsg("You need the guidance of city trainers for that.","system");return}
+  if(STATE.combat.inCombat)return;const cost=60,p=STATE.player;
+  if(p.gold<cost){logMsg(`The trainer eyes your coinpurse and shakes their head. Training costs <strong>${cost} gold</strong>.`,"system");return}
+  p.gold-=cost;p.xp+=20;p.maxHealth+=5;p.maxStamina+=4;p.maxMagicka+=3;
+  p.health=Math.min(p.health+15,p.maxHealth);
+  p.stamina=Math.min(p.stamina+15,p.maxStamina);
+  p.magicka=Math.min(p.magicka+15,p.maxMagicka);
+  logMsg("You spend hours training: blade drills, shield work, and meditation. Your body and mind grow stronger.","system");
+  levelUp();fullUpdate();
+}
+
+function smelter(){
+  // any legit city service should kick you out of black market mode
+  exitBlackMarketMode();
+
+  if(!inCity()){logMsg("You must be in a city to use a smelter.","system");return}
+  if(STATE.combat.inCombat)return;
+  const r=STATE.resources;let madeFe=0,madeCu=0,madeAu=0;
+  while(r.ironOre>=2){r.ironOre-=2;r.ironIngot++;madeFe++}
+  while(r.copperOre>=2){r.copperOre-=2;r.copperIngot++;madeCu++}
+  while(r.goldOre>=2){r.goldOre-=2;r.goldIngot++;madeAu++}
+  if(!madeFe&&!madeCu&&!madeAu){logMsg("The smelter's coals burn hot, but you have no ore worth smelting.","system");fullUpdate();return}
+  const parts=[];
+  if(madeFe)parts.push(`${madeFe} iron ingot${madeFe>1?"s":""}`);
+  if(madeCu)parts.push(`${madeCu} copper ingot${madeCu>1?"s":""}`);
+  if(madeAu)parts.push(`${madeAu} gold ingot${madeAu>1?"s":""}`);
+  logMsg(`You feed your ore into the smelter and draw out <strong>${parts.join(", ")}</strong>.`,"loot");fullUpdate();
+}
+
+function canCraftRecipe(r,res){for(const k in r.cost){if((res[k]||0)<r.cost[k])return false}return true}
+function payRecipeCost(r,res){for(const k in r.cost){res[k]-=r.cost[k];if(res[k]<0)res[k]=0}}
+
+function blacksmith(){
+// legit forge → exit black market visuals/mode
+  exitBlackMarketMode();
+  if(!inCity()){logMsg("You need the forges of a city blacksmith to work metal.","system");return}
+  if(STATE.combat.inCombat)return;
+  const res=STATE.resources;let chosen=null;
+  for(let i=RECIPES.length-1;i>=0;i--){if(canCraftRecipe(RECIPES[i],res)){chosen=RECIPES[i];break}}
+  if(!chosen){
+    logMsg('The blacksmith inspects your materials and shrugs. "Bring me some proper ingots or onyx, then we\'ll talk."', "system");return;
+  }
+  payRecipeCost(chosen,res);
+  const it={slot:chosen.slot,name:chosen.name,rarity:chosen.rarity,damage:null,armor:null,value:chosen.value};
+if(chosen.damage!=null)it.damage=chosen.damage;
+if(chosen.armor!=null)it.armor=chosen.armor;
+if(chosen.slot === "weapon" && chosen.weaponType){
+  it.weaponType = chosen.weaponType;
+}
+  STATE.inventory.push(it);
+  const mats=Object.entries(chosen.cost).map(([k,v])=>{
+    if(k==="ironIngot")return`${v} iron ingot${v>1?"s":""}`;
+    if(k==="copperIngot")return`${v} copper ingot${v>1?"s":""}`;
+    if(k==="goldIngot")return`${v} gold ingot${v>1?"s":""}`;
+    if(k==="onyx")return`${v} onyx shard${v>1?"s":""}`;
+    return`${v} ${k}`;
+  }).join(", ");
+  logMsg(`At the forge you work <strong>${mats}</strong> into a new piece of gear: <strong>${it.name}</strong> <span class="rarity-tag rarity-${it.rarity}">${R_LABEL[it.rarity]||"Crafted"}</span>.`,"loot");
+  fullUpdate();
+}
+
+function openCityShop(){
+  if (!inCity()){
+    logMsg("You must be in a city to browse a shop.","system");
+    return;
+  }
+
+  const cityId = STATE.world.currentCity;
+  const c = CITIES[cityId];
+
+  // ✅ Explicitly say “this is a normal shop”
+  STATE.shop.isBlackMarket = false;
+
+  genShop(cityId);
+
+  logMsg(
+    `You browse the <strong>markets of ${c.name}</strong>. Prices are official, paperwork mostly in order.`,
+    "system"
+  );
+
+  fullUpdate();
+}
+
+// Riften-only shady shop
+function riftenBlackMarket(){
+  if (!inCity()){
+    logMsg("You need to be inside a city to find anyone willing to trade in stolen goods.","system");
+    return;
+  }
+  if (STATE.combat.inCombat) return;
+
+  const cityId = STATE.world.currentCity;
+  if (cityId !== "riften"){
+    logMsg(
+      "You lower your voice and ask after \"special\" wares. Here, people just shake their heads. If there is a black market, it certainly isn't in this city.",
+      "event"
+    );
+    return;
+  }
+
+  if (!STATE.shop) STATE.shop = { items:[], isBlackMarket:false };
+
+  const p = STATE.player;
+  const skills = p.skills || {};
+  const thiefSkill = skills.thief || 0;
+
+  const baseTier = Math.min(3, Math.max(1, p.zone || 1));
+  const stock = [];
+
+  const makeOffer = (slot, name, rarity, statKey, statValue, basePrice) => {
+    const offer = {
+      slot,
+      name,
+      rarity,
+      damage: null,
+      armor: null,
+      value: basePrice,
+      price: basePrice
+    };
+    if (statKey === "damage") offer.damage = statValue;
+    if (statKey === "armor")  offer.armor  = statValue;
+    stock.push(offer);
+  };
+
+  const z = baseTier;
+  const dmgScale   = 6 + z * 4;
+  const armorScale = 8 + z * 5;
+
+  makeOffer(
+    "weapon",
+    "Shadowglass Dagger",
+    "superior",
+    "damage",
+    dmgScale + 4,
+    80 + z * 25
+  );
+
+  makeOffer(
+    "ring",
+    "Ring of the Footpad",
+    "fine",
+    "armor",
+    0,
+    70 + z * 20
+  );
+
+  makeOffer(
+    "amulet",
+    "Amulet of Whispers",
+    "superior",
+    "armor",
+    0,
+    90 + z * 25
+  );
+
+  makeOffer(
+    "chest",
+    "Blackguard's Leathers",
+    "epic",
+    "armor",
+    armorScale + 6,
+    120 + z * 35
+  );
+
+  const discount = Math.min(0.25, thiefSkill * 0.02);
+  if (discount > 0){
+    stock.forEach(it => {
+      it.price = Math.max(1, Math.round(it.price * (1 - discount)));
+      it.value = it.price;
+    });
+  }
+
+  STATE.shop.items = stock;
+  STATE.shop.isBlackMarket = true;
+
+  logMsg(
+    "You follow a series of half-whispered directions down into the canals beneath Riften. In a shadowed alcove, a fence lays out a spread of forbidden gear. <strong>Gold up front. No refunds. No questions.</strong>",
+    "event"
+  );
+
+  adjustReputation("riften", -1);
+
+  // turn on visual mode (if you added styles/banner)
+  document.body.classList.add("blackmarket-mode");
+  const banner = document.getElementById("blackmarket-banner");
+  if (banner) banner.style.display = "block";
+
+  updateInventory();
+}
+
+// Global helper: leaves shady mode and cleans UI
+function exitBlackMarketMode(){
+  document.body.classList.remove("blackmarket-mode");
+
+  const b = document.getElementById("blackmarket-banner");
+  if (b) b.style.display = "none";
+
+  if (STATE.shop) {
+    STATE.shop.isBlackMarket = false;
+  }
+}
+
+function spendSkill(which){
+  const s=STATE.player.skills||{warrior:0,mage:0,thief:0,points:0};
+  if(!s.points||s.points<=0){logMsg("You have no unspent skill points.","system");return}
+  if(!["warrior","mage","thief"].includes(which))return;
+  s.points--;s[which]++;let msg;
+  if(which==="warrior")msg="You hone your martial prowess. Your blows land harder and your guard feels surer.";
+  else if(which==="mage")msg="You deepen your understanding of destruction magic. Your spells strike with greater force.";
+  else msg="You practice moving unseen and slipping past blades. You feel lighter on your feet.";
+  logMsg(msg,"system");fullUpdate();
+}
+
+function openRaceModal(){
+  const m = document.getElementById("race-modal");
+  if (!m) return;
+
+  // Only show if this save has no race yet
+  if (STATE.player && STATE.player.raceId) {
+    // Race already chosen in this save → never show again
+    return;
+  }
+
+  m.style.display = "flex";
+}
+
+function closeRaceModal(){
+  const m=document.getElementById("race-modal");
+  if(m)m.style.display="none";
+}
+
+function setupRaceModal(){
+  const m = document.getElementById("race-modal");
+  if (!m) return;
+
+  // Clicking a race selects it (but doesn't close the modal)
+  m.querySelectorAll(".race-card").forEach(btn => {
+    btn.onclick = () => chooseRace(btn.dataset.race);
+  });
+
+  const nameInput = m.querySelector("#character-name-input");
+  const confirmBtn = m.querySelector("#confirm-race-btn");
+
+  if (nameInput) {
+    nameInput.value = STATE.player.name && STATE.player.name !== "Dragonborn"
+      ? STATE.player.name
+      : "";
+    nameInput.addEventListener("input", updateConfirmButtonState);
+  }
+
+  if (confirmBtn) {
+    confirmBtn.onclick = confirmCharacter;
+  }
+
+  // Initial state when modal first opens
+  updateRaceSummary();
+  updateConfirmButtonState();
+}
+
+function setupTabs() {
+  const tabs = document.querySelectorAll(".hud-tab");
+  const panels = {
+    status: document.getElementById("panel-status"),
+    equipment: document.getElementById("panel-equipment"),
+    inventory: document.getElementById("panel-inventory"),
+    spells: document.getElementById("panel-spells"),
+    shouts: document.getElementById("panel-shouts"),
+    bestiary: document.getElementById("panel-bestiary")
+  };
+
+  tabs.forEach(t => {
+    t.onclick = () => {
+      const k = t.dataset.tab;
+
+      tabs.forEach(x => x.classList.remove("active"));
+      t.classList.add("active");
+
+      Object.values(panels).forEach(p => p && p.classList.remove("active"));
+      if (panels[k]) panels[k].classList.add("active");
+
+      // refresh the panel you just opened
+      if (k === "inventory") updateInventory();
+      else if (k === "spells") updateSpells();
+      else if (k === "shouts") updateShouts();
+      else if (k === "bestiary") updateBestiary();
+    };
+  });
+}
+
+function setupPotionBtns(){document.querySelectorAll(".potion-type-btn").forEach(b=>{b.onclick=()=>{STATE.player.selectedPotion=b.dataset.potion;updatePotionBtns();saveGame()}})}
+
+function setupMobileLogPlacement() {
+  // Only do this on phones / small screens
+  if (window.innerWidth > 768) return;
+
+  const logShell = document.querySelector(".log-shell");
+  const actions  = document.querySelector(".actions");
+  const side     = document.querySelector(".side-panel");
+
+  if (!logShell || !side) return;
+
+  // Move the existing log so it sits above the action buttons
+  if (actions && actions.parentNode) {
+    actions.parentNode.insertBefore(logShell, actions);
+  } else {
+    // fallback: just append into the side panel
+    side.appendChild(logShell);
+  }
+
+  logShell.classList.add("mobile-in-panel");
+}
+
+function setupBtns(){
+  document.getElementById("btn-race-power").onclick=useRacePower;
+  document.getElementById("btn-explore").onclick=explore;
+  document.getElementById("btn-attack").onclick=pAttack;
+  document.getElementById("btn-block").onclick=pBlock;
+  document.getElementById("btn-cast").onclick=pCast;
+  document.getElementById("btn-potion").onclick=pPotion;
+  document.getElementById("btn-run").onclick=tryEscape;
+  document.getElementById("btn-shout").onclick=useShout;
+  document.getElementById("btn-temple").onclick=temple;
+  document.getElementById("btn-trainer").onclick=trainer;
+  document.getElementById("btn-smelter").onclick=smelter;
+  document.getElementById("btn-blacksmith").onclick=blacksmith;
+  document.getElementById("btn-black-market").onclick=riftenBlackMarket;
+  document.getElementById("btn-skill-warrior").onclick=()=>spendSkill("warrior");
+  document.getElementById("btn-skill-mage").onclick=()=>spendSkill("mage");
+  document.getElementById("btn-skill-thief").onclick=()=>spendSkill("thief");
+  const csd = document.getElementById("btn-comp-stance-def");
+  if (csd) csd.onclick = () => setCompanionStance("defensive");
+  const csb = document.getElementById("btn-comp-stance-bal");
+  if (csb) csb.onclick = () => setCompanionStance("balanced");
+  const csa = document.getElementById("btn-comp-stance-agg");
+  if (csa) csa.onclick = () => setCompanionStance("aggressive");
+  document.addEventListener("keydown",e=>{
+    const k=e.key.toLowerCase();
+    if(k==="e")explore();
+    else if(k==="a")pAttack();
+    else if(k==="b")pBlock();
+    else if(k==="f")pCast();
+    else if(k==="p")pPotion();
+    else if(k==="q")useShout();
+    else if(k==="r")useRacePower();
+    else if(k==="x")tryEscape();
+  });
+}
+
+/* ------------------------------
+   📱 Extra mobile behaviour
+   ------------------------------*/
+function isTouchDevice() {
+  return window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+}
+
+function setupMobileControls() {
+  if (!isTouchDevice()) return; // desktop stays unchanged
+
+  // Example: visually bump the main buttons on touch devices
+  const mainButtons = [
+    "btn-explore",
+    "btn-attack",
+    "btn-block",
+    "btn-cast",
+    "btn-potion",
+    "btn-shout",
+    "btn-run"
+  ];
+
+  mainButtons.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add("mobile-main-btn");
+    }
+  });
+}
+
+function init(){
+  const loaded = loadGame();
+
+  // Make sure the HUD name shows whatever is in the save
+  const nameEl = document.getElementById("player-name");
+  if (nameEl) nameEl.textContent = STATE.player.name;
+
+  setupTabs();
+  setupBtns();
+  setupFastTravel();
+  setupPotionBtns();
+  setupRaceModal();
+  setupMobileControls();
+  setupMobileLogPlacement();
+
+// --- MIGRATE OLD SAVES TO HAVE STARTING SPELLS / SHOUTS ---
+if (!STATE.player.spells || !Array.isArray(STATE.player.spells.known) || !STATE.player.spells.known.length) {
+  STATE.player.spells = {
+    known: [{ id: "frostbolt", rarity: "common" }],
+    equipped: "frostbolt"
+  };
+}
+
+if (!STATE.player.shouts || !Array.isArray(STATE.player.shouts.known) || !STATE.player.shouts.known.length) {
+  STATE.player.shouts = {
+    known: ["fus","wstep","frost"],
+    levels: { fus:1, wstep:1, frost:1 },
+    equipped: "fus"
+  };
+}
+
+  // Make sure the race modal starts hidden
+  const modal = document.getElementById("race-modal");
+  if (modal) modal.style.display = "none";
+
+  if (!loaded) {
+    // BRAND NEW GAME (no save existed under this key)
+    genShop("whiterun");
+    logMsg("You arrive in Whiterun, a safe city amid the frozen north. Traders eye your worn gear with interest.","system");
+    logMsg("Explore outside the walls to find loot, then return to cities to heal, train, buy and sell gear.","system");
+    logMsg("Quest added: <strong>Purging the Dead</strong> — defeat 3 undead anywhere in Skyrim.","system");
+    logMsg("Quest added: <strong>Relic for the Court</strong> — bring an <strong>epic</strong> item to <strong>Solitude</strong> for a rich reward.","system");
+    logMsg("You begin your path with the spell <strong>Frostbolt</strong>. Defeat foes and seek spellbooks to expand your grimoire.","system");
+  } else {
+    // EXISTING SAVE
+    logMsg("Your journey along the Northern Path resumes where you left off.","system");
+    if (inCity()) checkEpicQuest(STATE.world.currentCity);
+  }
+
+  // 🔑 SINGLE source of truth:
+  // If this save has no race yet, force choose ONCE.
+  if (!STATE.player.raceId) {
+    openRaceModal();
+  } else {
+    updateRaceUI();
+    // just in case, ensure it's hidden
+    if (modal) modal.style.display = "none";
+  }
+  const compInit = getActiveCompanion();
+  if (compInit) {
+    rescaleCompanion(compInit);
+  }
+  fullUpdate();
+}
+init();
+})();
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("service-worker.js")
+        .catch(err => console.error("SW registration failed:", err));
+    });
+  }
+</script>
+</body>
+</html>
