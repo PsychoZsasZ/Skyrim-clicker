@@ -5380,20 +5380,20 @@ function setupMobileControls() {
   });
 }
 function hideSplashScreen() {
-  const s = document.getElementById("splash-screen");
-  if (!s) return;
+  const splash = document.getElementById("splash-screen");
+  if (!splash) return;
 
   const elapsed = performance.now() - SPLASH_START;
   const remaining = SPLASH_MIN_MS - elapsed;
 
-  const doHide = () => {
-    s.classList.add("splash-hidden");
+  const finish = () => {
+    splash.classList.add("splash-hidden");
   };
 
   if (remaining > 0) {
-    setTimeout(doHide, remaining);
+    setTimeout(finish, remaining);
   } else {
-    doHide();
+    finish();
   }
 }
 function init(){
@@ -5476,6 +5476,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
