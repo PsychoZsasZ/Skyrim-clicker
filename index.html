@@ -1264,11 +1264,13 @@ function unlockShout(shoutId, sourceName){
     return;
   }
 
-  // Work out current + max level
+  // Use explicit maxLevel from SHOUTS, fall back to number of words or 3
+  const maxLevel = def.maxLevel || (SHOUT_WORDS[shoutId]?.length || 3);
   const currentLevel = sh.levels[shoutId] || 0;
-  const maxLevel     = def.maxLevel || (SHOUT_WORDS[shoutId]?.length || 3);
+  const known = sh.known.includes(shoutId);
+  const soulsBefore = p.dragonSouls;
 
-  // Already at cap? Just show the "shimmers faintly" line and bail.
+  // Already at cap? Just shimmer and bail.
   if (currentLevel >= maxLevel) {
     logMsg(
       `SYSTEM: The ancient word wall shimmers faintly, but you already know every word of <strong>${def.name}</strong>.`,
@@ -1277,15 +1279,16 @@ function unlockShout(shoutId, sourceName){
     return;
   }
 
-  // First word is always free
-  if (!sh.known.includes(shoutId) || currentLevel === 0) {
-    if (!sh.known.includes(shoutId)) {
-      sh.known.push(shoutId);
-    }
-    sh.levels[shoutId] = 1;
+  let newLevel = currentLevel;
+  let spentSoul = false;
+
+  if (!known || currentLevel === 0) {
+    // First word is always free
+    if (!known) sh.known.push(shoutId);
+    newLevel = 1;
   } else {
-    // Additional words cost 1 dragon soul
-    if (p.dragonSouls <= 0){
+    // Upgrading an already known shout: costs 1 Dragon Soul
+    if (p.dragonSouls <= 0) {
       logMsg(
         `SYSTEM: You feel the power, but lack a <strong>Dragon Soul</strong> to unlock the next word.`,
         "system"
@@ -1293,10 +1296,11 @@ function unlockShout(shoutId, sourceName){
       return;
     }
     p.dragonSouls--;
-    sh.levels[shoutId] = Math.min(maxLevel, currentLevel + 1);
+    spentSoul = true;
+    newLevel = Math.min(maxLevel, currentLevel + 1);
   }
 
-  const level = sh.levels[shoutId];
+  sh.levels[shoutId] = newLevel;
 
   // Cosmetic flavour based on level
   const words = [
@@ -1304,19 +1308,26 @@ function unlockShout(shoutId, sourceName){
     " (Second Word Learned)",  // level 2
     " (Full Power)"            // level 3
   ];
-  const suffix = words[level - 1] || "";
+  const suffix = words[newLevel - 1] || "";
 
-  const progress = shoutProgressLine(shoutId, level);
+  const progress = shoutProgressLine(shoutId, newLevel);
   const progressHTML = progress
     ? `<br><span class="shout-progress">${progress}</span>`
     : "";
 
+  const soulLine = spentSoul
+    ? `<br><span class="shout-soul-spent">A Dragon Soul is consumed to deepen your Thu'um.</span>`
+    : "";
+
   logMsg(
-    `At the glowing word wall in <strong>${sourceName}</strong>, you learn more of <strong>${def.name}</strong>${suffix}.${progressHTML}`,
+    `At the glowing word wall in <strong>${sourceName}</strong>, you learn more of <strong>${def.name}</strong>${suffix}.` +
+    progressHTML +
+    soulLine,
     "system"
   );
 
   updateShouts();
+  if (typeof updatePlayerUI === "function") updatePlayerUI();
   saveGame();
 }
 
@@ -3713,8 +3724,7 @@ function maybeUnlockShoutFromBoss(enemy){
     const def = SHOUTS[id];
     if (!def) return false;
 
-    // use shout's maxLevel if present, else fall back to number of words or 3
-    const maxLevel     = def.maxLevel || (SHOUT_WORDS[id]?.length || 3);
+    const maxLevel = def.maxLevel || (SHOUT_WORDS[id]?.length || 3);
     const currentLevel = sh.levels[id] || 0;
 
     return currentLevel < maxLevel;
@@ -3723,22 +3733,19 @@ function maybeUnlockShoutFromBoss(enemy){
   // If every shout in the pool is already at max level, show the shimmer message
   if (!upgradable.length) {
     logMsg(
-      `The ancient word wall shimmers faintly, but you already know every shout it could teach.`,
+      `SYSTEM: The ancient word wall shimmers faintly, but you already know every shout it could teach.`,
       "system"
     );
     return;
   }
 
-  // Pick one at random and let unlockShout handle:
-  //  - first word free
-  //  - extra words cost dragon souls
-  //  - respecting maxLevel
+  // Pick one at random and let unlockShout handle first-word-free + soul cost
   const idx    = randInt(0, upgradable.length - 1);
   const chosen = upgradable[idx];
 
   unlockShout(chosen, cave.name);
-  // No need to call updateShouts()/saveGame() here if unlockShout already does it.
 }
+
 
 function haveEpic(){
   const eq=STATE.player.equipment;
@@ -5798,6 +5805,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
