@@ -842,7 +842,13 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
         <div class="stat-pill"><span class="label">Armor</span><span class="value" id="stat-armor">0</span></div>
         <div class="stat-pill"><span class="label">Skill Pts</span><span class="value" id="skill-points-value">0</span></div>
       </div>
-    </div> <!-- end .stats -->
+      
+      <div class="stats-row">
+        <div class="stat-pill">
+          <span class="label">Dragon Souls</span>
+          <span class="value" id="dragon-souls-value">0</span>
+        </div>
+      </div>
 
     <!-- Enemy preview -->
     <div class="enemy-preview" id="enemy-preview">
@@ -2557,6 +2563,12 @@ function updateBars() {
   if (dmgEl)   dmgEl.textContent   = weaponDmg();
   if (armorEl) armorEl.textContent = armorRating();
   if (skillPts) skillPts.textContent = (p.skills && p.skills.points) || 0;
+
+  const soulsEl  = document.getElementById("dragon-souls-value");
+  const mhSouls  = document.getElementById("mh-dragon-souls");
+
+  if (soulsEl) soulsEl.textContent = p.dragonSouls || 0;
+  if (mhSouls) mhSouls.textContent = p.dragonSouls || 0;
 
   // Companion main bar
   const comp   = getActiveCompanion();
@@ -5654,6 +5666,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
