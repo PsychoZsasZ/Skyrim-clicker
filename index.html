@@ -1111,19 +1111,97 @@ let SPLASH_START = performance.now();
 const K = "NorthernPathSaveV4";
 
 const SHOUTS = {
-  fus:{id:"fus",name:"Unrelenting Force",type:"Force",description:"A powerful blast of pure force that batters and staggers your foe."},
-  fire:{id:"fire",name:"Fire Breath",type:"Fire",description:"Exhale a jet of dragonfire that sears enemies."},
-  frost:{id:"frost",name:"Frost Breath",type:"Frost",description:"Blast your foe with freezing wind, weakening their attacks."},
-  clear:{id:"clear",name:"Clear Skies",type:"Weather",description:"Tear away hostile weather and clear blizzards from your path."},
-  ethereal:{id:"ethereal",name:"Become Ethereal",type:"Defense",description:"For a brief moment, your body becomes ghost-like and unharmed by blows."},
-  wstep:{id:"wstep",name:"Whirlwind Sprint",type:"Movement",description:"Hurl yourself forward in a blur to escape danger."},
-  aura:{id:"aura",name:"Aura Whisper",type:"Utility",description:"Reveal the life force of your foe, attuning you to them."},
-  animal:{id:"animal",name:"Animal Allegiance",type:"Animal",description:"Call beasts of the wild to harry your enemy and aid your ally."},
-  disarm:{id:"disarm",name:"Disarm",type:"Control",description:"Rip weapons from your foe's grasp, leaving them scrambling."},
-  mark:{id:"mark",name:"Marked for Death",type:"Curse",description:"Etch a deathly mark upon your foe, tearing away their strength."},
-  slow:{id:"slow",name:"Slow Time",type:"Time",description:"To you, the world nearly stops as you move freely."},
-  storm:{id:"storm",name:"Storm Call",type:"Storm",description:"Summon a raging thunderstorm to strike your enemy."},
-  throw:{id:"throw",name:"Throw Voice",type:"Trick",description:"Project your voice elsewhere, distracting foes."}
+  fus:{
+    id:"fus",
+    name:"Unrelenting Force",
+    type:"Force",
+    description:"A powerful blast of pure force that batters and staggers your foe.",
+    maxLevel:3
+  },
+  fire:{
+    id:"fire",
+    name:"Fire Breath",
+    type:"Fire",
+    description:"Exhale a jet of dragonfire that sears enemies.",
+    maxLevel:3
+  },
+  frost:{
+    id:"frost",
+    name:"Frost Breath",
+    type:"Frost",
+    description:"Blast your foe with freezing wind, weakening their attacks.",
+    maxLevel:3
+  },
+  clear:{
+    id:"clear",
+    name:"Clear Skies",
+    type:"Weather",
+    description:"Tear away hostile weather and clear blizzards from your path.",
+    maxLevel:3
+  },
+  ethereal:{
+    id:"ethereal",
+    name:"Become Ethereal",
+    type:"Defense",
+    description:"For a brief moment, your body becomes ghost-like and unharmed by blows.",
+    maxLevel:3
+  },
+  wstep:{
+    id:"wstep",
+    name:"Whirlwind Sprint",
+    type:"Movement",
+    description:"Hurl yourself forward in a blur to escape danger.",
+    maxLevel:3
+  },
+  aura:{
+    id:"aura",
+    name:"Aura Whisper",
+    type:"Utility",
+    description:"Reveal the life force of your foe, attuning you to them.",
+    maxLevel:3
+  },
+  animal:{
+    id:"animal",
+    name:"Animal Allegiance",
+    type:"Animal",
+    description:"Call beasts of the wild to harry your enemy and aid your ally.",
+    maxLevel:3
+  },
+  disarm:{
+    id:"disarm",
+    name:"Disarm",
+    type:"Control",
+    description:"Rip weapons from your foe's grasp, leaving them scrambling.",
+    maxLevel:3
+  },
+  mark:{
+    id:"mark",
+    name:"Marked for Death",
+    type:"Curse",
+    description:"Etch a deathly mark upon your foe, tearing away their strength.",
+    maxLevel:3
+  },
+  slow:{
+    id:"slow",
+    name:"Slow Time",
+    type:"Time",
+    description:"To you, the world nearly stops as you move freely.",
+    maxLevel:3
+  },
+  storm:{
+    id:"storm",
+    name:"Storm Call",
+    type:"Storm",
+    description:"Summon a raging thunderstorm to strike your enemy.",
+    maxLevel:3
+  },
+  throw:{
+    id:"throw",
+    name:"Throw Voice",
+    type:"Trick",
+    description:"Project your voice elsewhere, distracting foes.",
+    maxLevel:3
+  }
 };
 
 const SHOUT_WORDS = {
@@ -1171,39 +1249,70 @@ const CAVE_SHOUT_POOL = [
 // Safely unlock a specific shout and log the word-wall flavour
 
 function unlockShout(shoutId, sourceName){
-  const p = STATE.player || (STATE.player = {});
+  const p  = STATE.player || (STATE.player = {});
   const sh = p.shouts || (p.shouts = { known:[], levels:{}, equipped:null });
 
   if (!Array.isArray(sh.known)) sh.known = [];
   if (!sh.levels) sh.levels = {};
 
-  if (!sh.known.includes(shoutId)) {
-    // First word is free
-    sh.known.push(shoutId);
+  const def = SHOUTS[shoutId];
+  if (!def) {
+    logMsg(
+      `SYSTEM: The word wall thrums with strange power, but you cannot grasp its meaning.`,
+      "system"
+    );
+    return;
+  }
+
+  // Work out current + max level
+  const currentLevel = sh.levels[shoutId] || 0;
+  const maxLevel     = def.maxLevel || (SHOUT_WORDS[shoutId]?.length || 3);
+
+  // Already at cap? Just show the "shimmers faintly" line and bail.
+  if (currentLevel >= maxLevel) {
+    logMsg(
+      `SYSTEM: The ancient word wall shimmers faintly, but you already know every word of <strong>${def.name}</strong>.`,
+      "system"
+    );
+    return;
+  }
+
+  // First word is always free
+  if (!sh.known.includes(shoutId) || currentLevel === 0) {
+    if (!sh.known.includes(shoutId)) {
+      sh.known.push(shoutId);
+    }
     sh.levels[shoutId] = 1;
   } else {
     // Additional words cost 1 dragon soul
     if (p.dragonSouls <= 0){
       logMsg(
-        `You feel the power, but lack a <strong>Dragon Soul</strong> to unlock the next word.`,
+        `SYSTEM: You feel the power, but lack a <strong>Dragon Soul</strong> to unlock the next word.`,
         "system"
       );
       return;
     }
     p.dragonSouls--;
-    sh.levels[shoutId] = Math.min(3, (sh.levels[shoutId] || 1) + 1);
+    sh.levels[shoutId] = Math.min(maxLevel, currentLevel + 1);
   }
 
   const level = sh.levels[shoutId];
-  const def = SHOUTS[shoutId];
-  const words = [""," (Second Word Learned)"," (Full Power)"];
+
+  // Cosmetic flavour based on level
+  const words = [
+    "",                        // level 1 – first word
+    " (Second Word Learned)",  // level 2
+    " (Full Power)"            // level 3
+  ];
+  const suffix = words[level - 1] || "";
+
   const progress = shoutProgressLine(shoutId, level);
   const progressHTML = progress
     ? `<br><span class="shout-progress">${progress}</span>`
     : "";
 
   logMsg(
-    `At the glowing word wall in <strong>${sourceName}</strong>, you learn more of <strong>${def.name}</strong>${words[level-1]}.${progressHTML}`,
+    `At the glowing word wall in <strong>${sourceName}</strong>, you learn more of <strong>${def.name}</strong>${suffix}.${progressHTML}`,
     "system"
   );
 
@@ -3593,13 +3702,26 @@ function maybeUnlockShoutFromBoss(enemy){
   const cave = CAVE_BY_ID[STATE.world.caveId];
   if (!cave || !cave.bossId || cave.bossId !== enemy.id) return;
 
-  const sh = STATE.player.shouts || (STATE.player.shouts = { known:[], equipped:null });
+  const p  = STATE.player || (STATE.player = {});
+  const sh = p.shouts || (p.shouts = { known:[], levels:{}, equipped:null });
+
   if (!Array.isArray(sh.known)) sh.known = [];
+  if (!sh.levels) sh.levels = {};
 
-  // Which shouts from the pool do we NOT know yet?
-  const unknown = CAVE_SHOUT_POOL.filter(id => SHOUTS[id] && !sh.known.includes(id));
+  // Which shouts from the pool are NOT yet at max level?
+  const upgradable = CAVE_SHOUT_POOL.filter(id => {
+    const def = SHOUTS[id];
+    if (!def) return false;
 
-  if (!unknown.length) {
+    // use shout's maxLevel if present, else fall back to number of words or 3
+    const maxLevel     = def.maxLevel || (SHOUT_WORDS[id]?.length || 3);
+    const currentLevel = sh.levels[id] || 0;
+
+    return currentLevel < maxLevel;
+  });
+
+  // If every shout in the pool is already at max level, show the shimmer message
+  if (!upgradable.length) {
     logMsg(
       `The ancient word wall shimmers faintly, but you already know every shout it could teach.`,
       "system"
@@ -3607,13 +3729,15 @@ function maybeUnlockShoutFromBoss(enemy){
     return;
   }
 
-  // Pick one at random and unlock it
-  const idx = randInt(0, unknown.length - 1);
-  const chosen = unknown[idx];
+  // Pick one at random and let unlockShout handle:
+  //  - first word free
+  //  - extra words cost dragon souls
+  //  - respecting maxLevel
+  const idx    = randInt(0, upgradable.length - 1);
+  const chosen = upgradable[idx];
 
   unlockShout(chosen, cave.name);
-  updateShouts();
-  saveGame();
+  // No need to call updateShouts()/saveGame() here if unlockShout already does it.
 }
 
 function haveEpic(){
@@ -5674,6 +5798,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
