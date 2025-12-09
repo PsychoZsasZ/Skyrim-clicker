@@ -306,6 +306,81 @@
   opacity: 0.4;
   cursor: default;
 }
+/* --------- MOBILE HUD (only shows on phones) ---------- */
+
+.mobile-hud {
+  display: none; /* hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .mobile-hud {
+    display: block;
+    margin: 12px 0 8px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(15,23,42,0.96);
+    border: 1px solid rgba(148,163,184,0.35);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  }
+
+  .mh-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+
+  .mh-row.mh-small {
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .mh-label {
+    min-width: 42px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    color: #9ca3af;
+  }
+
+  .mh-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(15,23,42,1);
+    overflow: hidden;
+  }
+
+  .mh-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    transition: width 150ms linear;
+  }
+
+  .mh-health {
+    background: linear-gradient(to right, #f97373, #facc15);
+  }
+  .mh-stamina {
+    background: linear-gradient(to right, #22c55e, #a3e635);
+  }
+  .mh-magicka {
+    background: linear-gradient(to right, #38bdf8, #6366f1);
+  }
+
+  .mh-value {
+    min-width: 74px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
+  }
+
+  /* shrink the big resource rows on phones (we now have the compact HUD) */
+  #panel-status .resource-row {
+    display: none;
+  }
+}
 :root{--bg:#030507;--bg-alt:#06080d;--card:#090d14;--accent:#d4af37;--accent-soft:rgba(212,175,55,.12);--danger:#f97373;--text:#e5e7eb;--text-soft:#9ca3af;--border:#1f2933;--radius-lg:16px;--radius-xl:22px;--shadow-soft:0 18px 45px rgba(0,0,0,.85);}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0,rgba(148,163,184,.22),transparent 55%),radial-gradient(circle at 80% 0,rgba(55,65,81,.45),transparent 60%),radial-gradient(circle at 50% 100%,rgba(15,23,42,.65),#02040a);color:var(--text);display:flex;align-items:stretch;justify-content:center;padding:20px;}
@@ -780,7 +855,39 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
         <div class="enemy-meta" id="enemy-meta">No enemy engaged.</div>
       </div>
     </div>
+<!-- MOBILE HUD: always near the buttons on phones -->
+    <div id="mobile-hud" class="mobile-hud">
+      <div class="mh-row">
+        <span class="mh-label">HP</span>
+        <div class="mh-bar">
+          <div class="mh-fill mh-health" id="mh-health-bar"></div>
+        </div>
+        <span class="mh-value" id="mh-health-text">0 / 0</span>
+      </div>
+      <div class="mh-row">
+        <span class="mh-label">Stam</span>
+        <div class="mh-bar">
+          <div class="mh-fill mh-stamina" id="mh-stamina-bar"></div>
+        </div>
+        <span class="mh-value" id="mh-stamina-text">0 / 0</span>
+      </div>
+      <div class="mh-row">
+        <span class="mh-label">Mag</span>
+        <div class="mh-bar">
+          <div class="mh-fill mh-magicka" id="mh-magicka-bar"></div>
+        </div>
+        <span class="mh-value" id="mh-magicka-text">0 / 0</span>
+      </div>
 
+      <div class="mh-row mh-small">
+        <span class="mh-label">Comp</span>
+        <span class="mh-value" id="mh-companion-text">No companion</span>
+      </div>
+      <div class="mh-row mh-small">
+        <span class="mh-label">Foe</span>
+        <span class="mh-value" id="mh-enemy-text">None</span>
+      </div>
+    </div>
     <!-- Actions -->
     <div class="actions">
       <div>
@@ -2438,14 +2545,38 @@ function updateBars(){
       chText.textContent = "No companion";
     }
   }
+// 🔹 Mobile HUD mirrors
+  const mhHBar  = document.getElementById("mh-health-bar");
+  const mhHText = document.getElementById("mh-health-text");
+  const mhSBar  = document.getElementById("mh-stamina-bar");
+  const mhSText = document.getElementById("mh-stamina-text");
+  const mhMBar  = document.getElementById("mh-magicka-bar");
+  const mhMText = document.getElementById("mh-magicka-text");
+  const mhComp  = document.getElementById("mh-companion-text");
 
- // NEW: reputation line under companion bar
+  if (mhHBar && mhHText && mhSBar && mhSText && mhMBar && mhMText) {
+    mhHBar.style.width = h + "%";
+    mhHText.textContent = `${p.health} / ${p.maxHealth}`;
+
+    mhSBar.style.width = s + "%";
+    mhSText.textContent = `${p.stamina} / ${p.maxStamina}`;
+
+    mhMBar.style.width = m + "%";
+    mhMText.textContent = `${p.magicka} / ${p.maxMagicka}`;
+  }
+
+  if (mhComp) {
+    if (comp && comp.maxHealth > 0) {
+      mhComp.textContent = `${comp.name} ${comp.health} / ${comp.maxHealth}`;
+    } else {
+      mhComp.textContent = "No companion";
+    }
+  }
+
+  // NEW: reputation + minerals
   updateHudReputation();
-
-// Minerals line
   updateResourcesUI();
 }
-
 function updateScene(){
   const {x,y}=STATE.world;let z=STATE.player.zone;
   if(STATE.world.inCave&&STATE.world.caveId){
@@ -3073,17 +3204,30 @@ btns.append(be, bc, bs);
   const hpText = document.getElementById("enemy-health-text");
   const meta   = document.getElementById("enemy-meta");
 
-  const e = STATE.combat && STATE.combat.enemy;
+ const e = STATE.combat && STATE.combat.enemy;
+
+  const mhEnemy = document.getElementById("mh-enemy-text");
 
   // No combat or no enemy → reset display
   if (!STATE.combat || !STATE.combat.inCombat || !e) {
-    if (nameEl) nameEl.textContent = "None";
-    if (hpBar)  hpBar.style.width  = "0%";
-    if (hpText) hpText.textContent = "";
-    if (meta)   meta.textContent   = "No enemy engaged.";
+    nameEl.textContent = "None";
+    hpBar.style.width = "0%";
+    hpText.textContent = "";
+    meta.textContent = "No enemy engaged.";
+    if (mhEnemy) mhEnemy.textContent = "None";
     return;
   }
 
+  nameEl.textContent = e.name || "Unknown foe";
+  const pct = (e.health / e.maxHealth) * 100;
+  hpBar.style.width = pct + "%";
+  hpText.textContent = `${e.health} / ${e.maxHealth}`;
+  meta.textContent = e.group || "";
+
+  if (mhEnemy) {
+    mhEnemy.textContent = `${e.name} ${e.health} / ${e.maxHealth}`;
+  }
+}
   // Basic HP bar / text
   const pct = (e.health / e.maxHealth) * 100;
   if (nameEl) nameEl.textContent = e.name;
@@ -5476,6 +5620,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
