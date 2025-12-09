@@ -2514,38 +2514,68 @@ function setCompanionStance(stanceId){
   saveGame();
 }
 
-function updateBars(){
-  const p=STATE.player;
-  const h=p.health/p.maxHealth*100,s=p.stamina/p.maxStamina*100,m=p.magicka/p.maxMagicka*100;
-  document.getElementById("health-bar").style.width=h+"%";
-  document.getElementById("stamina-bar").style.width=s+"%";
-  document.getElementById("magicka-bar").style.width=m+"%";
-  document.getElementById("health-text").textContent=`${p.health} / ${p.maxHealth}`;
-  document.getElementById("stamina-text").textContent=`${p.stamina} / ${p.maxStamina}`;
-  document.getElementById("magicka-text").textContent=`${p.magicka} / ${p.maxMagicka}`;
-  document.getElementById("gold-value").textContent=p.gold;
-  document.getElementById("potions-value").textContent=`H:${p.potions.health} S:${p.potions.stamina} M:${p.potions.magicka}`;
-  document.getElementById("zone-value").textContent=STATE.player.zone;
-  document.getElementById("player-level").textContent=`Level ${p.level} • ${p.xp} / ${p.xpToNext} XP`;
-  document.getElementById("stat-weapon-dmg").textContent=weaponDmg();
-  document.getElementById("stat-armor").textContent=armorRating();
-  document.getElementById("skill-points-value").textContent=STATE.player.skills?.points||0;
+function updateBars() {
+  const p = STATE.player || {};
 
-  // Companion bar
-  const comp = getActiveCompanion();
-  const chBar = document.getElementById("companion-health-bar");
+  const hPct = p.maxHealth ? (p.health / p.maxHealth) * 100 : 0;
+  const sPct = p.maxStamina ? (p.stamina / p.maxStamina) * 100 : 0;
+  const mPct = p.maxMagicka ? (p.magicka / p.maxMagicka) * 100 : 0;
+
+  // Main big bars
+  const hb  = document.getElementById("health-bar");
+  const sb  = document.getElementById("stamina-bar");
+  const mb  = document.getElementById("magicka-bar");
+  const hTx = document.getElementById("health-text");
+  const sTx = document.getElementById("stamina-text");
+  const mTx = document.getElementById("magicka-text");
+
+  if (hb)  hb.style.width  = hPct + "%";
+  if (sb)  sb.style.width  = sPct + "%";
+  if (mb)  mb.style.width  = mPct + "%";
+  if (hTx) hTx.textContent = `${p.health} / ${p.maxHealth}`;
+  if (sTx) sTx.textContent = `${p.stamina} / ${p.maxStamina}`;
+  if (mTx) mTx.textContent = `${p.magicka} / ${p.maxMagicka}`;
+
+  // Core numeric stats
+  const goldEl   = document.getElementById("gold-value");
+  const potsEl   = document.getElementById("potions-value");
+  const zoneEl   = document.getElementById("zone-value");
+  const levelEl  = document.getElementById("player-level");
+  const dmgEl    = document.getElementById("stat-weapon-dmg");
+  const armorEl  = document.getElementById("stat-armor");
+  const skillPts = document.getElementById("skill-points-value");
+
+  if (goldEl)  goldEl.textContent = p.gold;
+  if (potsEl)  potsEl.textContent =
+    `H:${p.potions.health} S:${p.potions.stamina} M:${p.potions.magicka}`;
+  if (zoneEl)  zoneEl.textContent = p.zone;
+  if (levelEl) levelEl.textContent =
+    `Level ${p.level} • ${p.xp} / ${p.xpToNext} XP`;
+  if (dmgEl)   dmgEl.textContent   = weaponDmg();
+  if (armorEl) armorEl.textContent = armorRating();
+  if (skillPts) skillPts.textContent = (p.skills && p.skills.points) || 0;
+
+  // Companion main bar
+  const comp   = getActiveCompanion();
+  const chBar  = document.getElementById("companion-health-bar");
   const chText = document.getElementById("companion-health-text");
+
   if (chBar && chText) {
     if (comp && comp.maxHealth > 0) {
-      const pct = (comp.health / comp.maxHealth) * 100;
-      chBar.style.width = pct + "%";
-      chText.textContent = `${comp.name} [${companionStanceLabel(comp)}]: ${comp.health} / ${comp.maxHealth}`;
+      const cPct = (comp.health / comp.maxHealth) * 100;
+      chBar.style.width = cPct + "%";
+      const stanceLabel = companionStanceLabel
+        ? companionStanceLabel(comp)
+        : (comp.stance || "Balanced");
+      chText.textContent =
+        `${comp.name} [${stanceLabel}]: ${comp.health} / ${comp.maxHealth}`;
     } else {
       chBar.style.width = "0%";
       chText.textContent = "No companion";
     }
   }
-// 🔹 Mobile HUD mirrors
+
+  // 🔹 Mobile HUD mirrors
   const mhHBar  = document.getElementById("mh-health-bar");
   const mhHText = document.getElementById("mh-health-text");
   const mhSBar  = document.getElementById("mh-stamina-bar");
@@ -2554,17 +2584,18 @@ function updateBars(){
   const mhMText = document.getElementById("mh-magicka-text");
   const mhComp  = document.getElementById("mh-companion-text");
 
-  if (mhHBar && mhHText && mhSBar && mhSText && mhMBar && mhMText) {
-    mhHBar.style.width = h + "%";
+  if (mhHBar && mhHText) {
+    mhHBar.style.width = hPct + "%";
     mhHText.textContent = `${p.health} / ${p.maxHealth}`;
-
-    mhSBar.style.width = s + "%";
+  }
+  if (mhSBar && mhSText) {
+    mhSBar.style.width = sPct + "%";
     mhSText.textContent = `${p.stamina} / ${p.maxStamina}`;
-
-    mhMBar.style.width = m + "%";
+  }
+  if (mhMBar && mhMText) {
+    mhMBar.style.width = mPct + "%";
     mhMText.textContent = `${p.magicka} / ${p.maxMagicka}`;
   }
-
   if (mhComp) {
     if (comp && comp.maxHealth > 0) {
       mhComp.textContent = `${comp.name} ${comp.health} / ${comp.maxHealth}`;
@@ -2573,10 +2604,11 @@ function updateBars(){
     }
   }
 
-  // NEW: reputation + minerals
+  // Reputation + resources (these were already in your original function)
   updateHudReputation();
   updateResourcesUI();
 }
+
 function updateScene(){
   const {x,y}=STATE.world;let z=STATE.player.zone;
   if(STATE.world.inCave&&STATE.world.caveId){
@@ -3195,55 +3227,50 @@ btns.append(be, bc, bs);
     console.error("updateInventory error", err);
   }
 }
- function updateEnemyPreview(){
-  const box = document.getElementById("enemy-preview");
-  if (!box) return;
-
+  
+ function updateEnemyPreview() {
+  const box   = document.getElementById("enemy-preview");
   const nameEl = document.getElementById("enemy-name");
   const hpBar  = document.getElementById("enemy-health-bar");
   const hpText = document.getElementById("enemy-health-text");
   const meta   = document.getElementById("enemy-meta");
-
- const e = STATE.combat && STATE.combat.enemy;
-
   const mhEnemy = document.getElementById("mh-enemy-text");
 
-  // No combat or no enemy → reset display
-  if (!STATE.combat || !STATE.combat.inCombat || !e) {
+  if (!box || !nameEl || !hpBar || !hpText || !meta) return;
+
+  const combat = STATE.combat;
+  const e = combat && combat.enemy;
+
+  // No combat / no enemy
+  if (!combat || !combat.inCombat || !e) {
     nameEl.textContent = "None";
-    hpBar.style.width = "0%";
+    hpBar.style.width  = "0%";
     hpText.textContent = "";
-    meta.textContent = "No enemy engaged.";
+    meta.textContent   = "No enemy engaged.";
     if (mhEnemy) mhEnemy.textContent = "None";
     return;
   }
 
+  // Basic info
   nameEl.textContent = e.name || "Unknown foe";
-  const pct = (e.health / e.maxHealth) * 100;
+  const pct = e.maxHealth ? (e.health / e.maxHealth) * 100 : 0;
   hpBar.style.width = pct + "%";
   hpText.textContent = `${e.health} / ${e.maxHealth}`;
-  meta.textContent = e.group || "";
-
-  if (mhEnemy) {
-    mhEnemy.textContent = `${e.name} ${e.health} / ${e.maxHealth}`;
-  }
-}
-  // Basic HP bar / text
-  const pct = (e.health / e.maxHealth) * 100;
-  if (nameEl) nameEl.textContent = e.name;
-  if (hpBar)  hpBar.style.width  = pct + "%";
-  if (hpText) hpText.textContent = `${e.health} / ${e.maxHealth}`;
 
   // Simple meta line (keep it robust)
-  if (meta) {
-    const tier  = e.tier ?? 1;
-    const type  = e.type || "Unknown";
-    const minD  = e.minDamage ?? "?";
-    const maxD  = e.maxDamage ?? "?";
-    const icons = tier === 1 ? "⚔" : tier === 2 ? "⚔⚔" : "⚔⚔⚔";
-    meta.textContent = `${type} • Tier ${tier} • DMG ${minD}-${maxD} • ${icons} threat`;
+  const tier  = e.tier ?? 1;
+  const type  = e.type || "Unknown";
+  const minD  = e.minDamage ?? "?";
+  const maxD  = e.maxDamage ?? "?";
+  const icons = tier === 1 ? "⚔" : tier === 2 ? "⚔⚔" : "⚔⚔⚔";
+  meta.textContent = `${type} • Tier ${tier} • DMG ${minD}-${maxD} • ${icons} threat`;
+
+  // Mobile HUD mirror
+  if (mhEnemy) {
+    mhEnemy.textContent = `${e.name || "Foe"} ${e.health} / ${e.maxHealth}`;
   }
 }
+
 
 function fullUpdate(){
   // Core HUD + scene
@@ -5620,6 +5647,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
