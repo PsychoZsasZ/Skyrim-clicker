@@ -779,7 +779,7 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
     <button class="hud-tab" data-tab="bestiary">Bestiary</button>
   </div>
 
-<!-- STATUS PANEL -->
+  <!-- STATUS PANEL -->
   <div class="hud-panel active" id="panel-status">
     <div class="stats">
       <div class="stats-header">
@@ -789,7 +789,6 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
         </div>
         <div class="stats-level" id="player-level">Level 1 • 0 / 25 XP</div>
       </div>
-      <!-- stats body filled by JS -->
 
       <div class="resource-row">
         <div class="resource-label">Health</div>
@@ -822,8 +821,10 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
           <div class="bar-text" id="companion-health-text"></div>
         </div>
       </div>
+
       <!-- NEW: reputation summary in the HUD -->
-      <div id="hud-rep-summary" class="hud-rep-row"></div> 
+      <div id="hud-rep-summary" class="hud-rep-row"></div>
+
       <div class="resource-row">
         <div class="resource-label">Materials</div>
         <div class="materials-text" id="materials-text">
@@ -842,13 +843,14 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
         <div class="stat-pill"><span class="label">Armor</span><span class="value" id="stat-armor">0</span></div>
         <div class="stat-pill"><span class="label">Skill Pts</span><span class="value" id="skill-points-value">0</span></div>
       </div>
-      
+
       <div class="stats-row">
         <div class="stat-pill">
           <span class="label">Dragon Souls</span>
           <span class="value" id="dragon-souls-value">0</span>
         </div>
       </div>
+    </div> <!-- end .stats -->
 
     <!-- Enemy preview -->
     <div class="enemy-preview" id="enemy-preview">
@@ -864,7 +866,8 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
         <div class="enemy-meta" id="enemy-meta">No enemy engaged.</div>
       </div>
     </div>
-<!-- MOBILE HUD: always near the buttons on phones -->
+
+    <!-- MOBILE HUD: always near the buttons on phones -->
     <div id="mobile-hud" class="mobile-hud">
       <div class="mh-row">
         <span class="mh-label">HP</span>
@@ -896,7 +899,12 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
         <span class="mh-label">Foe</span>
         <span class="mh-value" id="mh-enemy-text">None</span>
       </div>
+      <div class="mh-row mh-small">
+        <span class="mh-label">Souls</span>
+        <span class="mh-value" id="mh-dragon-souls">0</span>
+      </div>
     </div>
+
     <!-- Actions -->
     <div class="actions">
       <div>
@@ -950,16 +958,16 @@ body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSyste
 
       <div>
         <div class="actions-group-label">City Services (in cities only)</div>
-<div class="button-row">
-  <button class="action-btn" id="btn-temple">Temple</button>
-  <button class="action-btn" id="btn-trainer">Trainer</button>
-  <button class="action-btn" id="btn-smelter">Smelter</button>
-  <button class="action-btn" id="btn-blacksmith">Blacksmith</button>
-  <button class="action-btn" id="btn-black-market">Black Market</button>
-</div>
+        <div class="button-row">
+          <button class="action-btn" id="btn-temple">Temple</button>
+          <button class="action-btn" id="btn-trainer">Trainer</button>
+          <button class="action-btn" id="btn-smelter">Smelter</button>
+          <button class="action-btn" id="btn-blacksmith">Blacksmith</button>
+          <button class="action-btn" id="btn-black-market">Black Market</button>
+        </div>
       </div>
-    </div>
-  </div>
+    </div> <!-- end .actions -->
+  </div> <!-- end #panel-status -->
 
   <div class="hud-panel" id="panel-equipment">
   <div class="equip-panel-inner">
@@ -5666,6 +5674,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
