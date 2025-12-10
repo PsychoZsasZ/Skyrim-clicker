@@ -4525,22 +4525,76 @@ function pCast(){
 }
 
 function pPotion(){
-  if(!STATE.combat.inCombat)return;
-  tickShoutCooldown();const type=STATE.player.selectedPotion||"health",p=STATE.player.potions;
-  if(!p[type]){logMsg(`You fumble for a ${type} potion, but your satchel is empty.`,"system");return}
-  const traits=getTraitEffects(),potMult=1+(traits.potionBonus||0);
-  p[type]--;let amt;
-  if(type==="health"){
-    amt=Math.round(randInt(25,40)*potMult);STATE.player.health=clamp(STATE.player.health+amt,0,STATE.player.maxHealth);
-    logMsg(`You drink a <strong>health potion</strong>, restoring <strong>${amt}</strong> health.`,"system");
-  }else if(type==="stamina"){
-    amt=Math.round(randInt(25,40)*potMult);STATE.player.stamina=clamp(STATE.player.stamina+amt,0,STATE.player.maxStamina);
-    logMsg(`You drink a <strong>stamina potion</strong>, restoring <strong>${amt}</strong> stamina.`,"system");
-  }else{
-    amt=Math.round(randInt(25,40)*potMult);STATE.player.magicka=clamp(STATE.player.magicka+amt,0,STATE.player.maxMagicka);
-    logMsg(`You drink a <strong>magicka potion</strong>, restoring <strong>${amt}</strong> magicka.`,"system");
+  if (!STATE.combat.inCombat) return;
+
+  tickShoutCooldown();
+
+  const type = STATE.player.selectedPotion || "health";
+  const pots = STATE.player.potions || {};
+  const player = STATE.player;
+
+  if (!pots[type]) {
+    logMsg(`You fumble for a ${type} potion, but your satchel is empty.`, "system");
+    return;
   }
-  fullUpdate();enemyTurn();
+
+  const traits  = getTraitEffects();
+  const potMult = 1 + (traits.potionBonus || 0);
+
+  // Spend the potion
+  pots[type]--;
+
+  let amt = 0;
+
+  if (type === "health") {
+    // 💊 BIG BUFF: heal a large % of max HP
+    // Random between 55%–75% of max health, then apply potion bonus
+    const pct   = randInt(55, 75) / 100; 
+    const base  = Math.round(player.maxHealth * pct);
+    amt         = Math.round(base * potMult);
+
+    const newHp = clamp(player.health + amt, 0, player.maxHealth);
+    const actual = newHp - player.health;
+    player.health = newHp;
+
+    logMsg(
+      `You drink a <strong>health potion</strong>, restoring <strong>${actual}</strong> health.`,
+      "system"
+    );
+
+  } else if (type === "stamina") {
+    // Stamina: strong but a bit less than health
+    const pct   = randInt(45, 65) / 100;
+    const base  = Math.round(player.maxStamina * pct);
+    amt         = Math.round(base * potMult);
+
+    const newStam = clamp(player.stamina + amt, 0, player.maxStamina);
+    const actual  = newStam - player.stamina;
+    player.stamina = newStam;
+
+    logMsg(
+      `You drink a <strong>stamina potion</strong>, restoring <strong>${actual}</strong> stamina.`,
+      "system"
+    );
+
+  } else {
+    // Magicka: same pattern as stamina
+    const pct   = randInt(45, 65) / 100;
+    const base  = Math.round(player.maxMagicka * pct);
+    amt         = Math.round(base * potMult);
+
+    const newMag = clamp(player.magicka + amt, 0, player.maxMagicka);
+    const actual = newMag - player.magicka;
+    player.magicka = newMag;
+
+    logMsg(
+      `You drink a <strong>magicka potion</strong>, restoring <strong>${actual}</strong> magicka.`,
+      "system"
+    );
+  }
+
+  fullUpdate();
+  enemyTurn();  // still costs you your turn
 }
 
 function logCompanionShoutReaction(shoutId, level){
@@ -5901,6 +5955,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
