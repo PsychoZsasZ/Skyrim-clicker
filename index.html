@@ -1331,10 +1331,280 @@ function unlockShout(shoutId, sourceName){
   saveGame();
 }
 
+// === SPELL DEFINITIONS ===
+// Simple baseline stats per rank
+const SPELL_BASE = {
+  novice:     { dmg:[8,12],   cost:10 },
+  apprentice: { dmg:[14,22],  cost:18 },
+  adept:      { dmg:[22,32],  cost:30 },
+  expert:     { dmg:[32,48],  cost:45 },
+  master:     { dmg:[46,70],  cost:70 }
+};
+
 const SPELLS = {
-  frostbolt:{id:"frostbolt",name:"Frostbolt",school:"Destruction",element:"Frost",minDamage:10,maxDamage:16,baseCost:12,description:"A shard of ice that pierces and chills a single foe."},
-  firebolt:{id:"firebolt",name:"Firebolt",school:"Destruction",element:"Fire",minDamage:11,maxDamage:18,baseCost:13,description:"A bolt of flame that scorches a single target."},
-  shockbolt:{id:"shockbolt",name:"Shockbolt",school:"Destruction",element:"Shock",minDamage:9,maxDamage:20,baseCost:14,description:"A crackling lance of lightning that jolts your enemy."}
+  // --- Destruction: Novice ---
+  flames: {
+    id: "flames",
+    name: "Flames",
+    school: "Destruction",
+    rank: "novice",
+    element: "fire",
+    minDamage: SPELL_BASE.novice.dmg[0],
+    maxDamage: SPELL_BASE.novice.dmg[1],
+    baseCost: SPELL_BASE.novice.cost
+  },
+  frostbite: {
+    id: "frostbite",
+    name: "Frostbite",
+    school: "Destruction",
+    rank: "novice",
+    element: "frost",
+    minDamage: SPELL_BASE.novice.dmg[0],
+    maxDamage: SPELL_BASE.novice.dmg[1],
+    baseCost: SPELL_BASE.novice.cost
+  },
+  sparks: {
+    id: "sparks",
+    name: "Sparks",
+    school: "Destruction",
+    rank: "novice",
+    element: "shock",
+    minDamage: SPELL_BASE.novice.dmg[0],
+    maxDamage: SPELL_BASE.novice.dmg[1],
+    baseCost: SPELL_BASE.novice.cost
+  },
+
+  // --- Destruction: Apprentice ---
+  firebolt: {
+    id: "firebolt",
+    name: "Firebolt",
+    school: "Destruction",
+    rank: "apprentice",
+    element: "fire",
+    minDamage: SPELL_BASE.apprentice.dmg[0],
+    maxDamage: SPELL_BASE.apprentice.dmg[1],
+    baseCost: SPELL_BASE.apprentice.cost
+  },
+  ice_spike: {
+    id: "ice_spike",
+    name: "Ice Spike",
+    school: "Destruction",
+    rank: "apprentice",
+    element: "frost",
+    minDamage: SPELL_BASE.apprentice.dmg[0],
+    maxDamage: SPELL_BASE.apprentice.dmg[1],
+    baseCost: SPELL_BASE.apprentice.cost
+  },
+  lightning_bolt: {
+    id: "lightning_bolt",
+    name: "Lightning Bolt",
+    school: "Destruction",
+    rank: "apprentice",
+    element: "shock",
+    minDamage: SPELL_BASE.apprentice.dmg[0],
+    maxDamage: SPELL_BASE.apprentice.dmg[1],
+    baseCost: SPELL_BASE.apprentice.cost
+  },
+
+  // --- Destruction: Adept ---
+  fireball: {
+    id: "fireball",
+    name: "Fireball",
+    school: "Destruction",
+    rank: "adept",
+    element: "fire",
+    minDamage: SPELL_BASE.adept.dmg[0],
+    maxDamage: SPELL_BASE.adept.dmg[1],
+    baseCost: SPELL_BASE.adept.cost
+  },
+  ice_storm: {
+    id: "ice_storm",
+    name: "Ice Storm",
+    school: "Destruction",
+    rank: "adept",
+    element: "frost",
+    minDamage: SPELL_BASE.adept.dmg[0],
+    maxDamage: SPELL_BASE.adept.dmg[1],
+    baseCost: SPELL_BASE.adept.cost
+  },
+  chain_lightning: {
+    id: "chain_lightning",
+    name: "Chain Lightning",
+    school: "Destruction",
+    rank: "adept",
+    element: "shock",
+    minDamage: SPELL_BASE.adept.dmg[0],
+    maxDamage: SPELL_BASE.adept.dmg[1],
+    baseCost: SPELL_BASE.adept.cost
+  },
+
+  // --- Destruction: Expert ---
+  incinerate: {
+    id: "incinerate",
+    name: "Incinerate",
+    school: "Destruction",
+    rank: "expert",
+    element: "fire",
+    minDamage: SPELL_BASE.expert.dmg[0],
+    maxDamage: SPELL_BASE.expert.dmg[1],
+    baseCost: SPELL_BASE.expert.cost
+  },
+  icy_spear: {
+    id: "icy_spear",
+    name: "Icy Spear",
+    school: "Destruction",
+    rank: "expert",
+    element: "frost",
+    minDamage: SPELL_BASE.expert.dmg[0],
+    maxDamage: SPELL_BASE.expert.dmg[1],
+    baseCost: SPELL_BASE.expert.cost
+  },
+  thunderbolt: {
+    id: "thunderbolt",
+    name: "Thunderbolt",
+    school: "Destruction",
+    rank: "expert",
+    element: "shock",
+    minDamage: SPELL_BASE.expert.dmg[0],
+    maxDamage: SPELL_BASE.expert.dmg[1],
+    baseCost: SPELL_BASE.expert.cost
+  },
+
+  // --- Destruction: Master ---
+  fire_storm: {
+    id: "fire_storm",
+    name: "Fire Storm",
+    school: "Destruction",
+    rank: "master",
+    element: "fire",
+    minDamage: SPELL_BASE.master.dmg[0],
+    maxDamage: SPELL_BASE.master.dmg[1],
+    baseCost: SPELL_BASE.master.cost
+  },
+  blizzard: {
+    id: "blizzard",
+    name: "Blizzard",
+    school: "Destruction",
+    rank: "master",
+    element: "frost",
+    minDamage: SPELL_BASE.master.dmg[0],
+    maxDamage: SPELL_BASE.master.dmg[1],
+    baseCost: SPELL_BASE.master.cost
+  },
+  lightning_storm: {
+    id: "lightning_storm",
+    name: "Lightning Storm",
+    school: "Destruction",
+    rank: "master",
+    element: "shock",
+    minDamage: SPELL_BASE.master.dmg[0],
+    maxDamage: SPELL_BASE.master.dmg[1],
+    baseCost: SPELL_BASE.master.cost
+  },
+
+  // --- Conjuration: some core combat spells ---
+  conjure_familiar: {
+    id: "conjure_familiar",
+    name: "Conjure Familiar",
+    school: "Conjuration",
+    rank: "novice",
+    element: "summon",
+    minDamage: SPELL_BASE.novice.dmg[0] - 2,
+    maxDamage: SPELL_BASE.novice.dmg[1],
+    baseCost: SPELL_BASE.novice.cost + 4
+  },
+  bound_sword: {
+    id: "bound_sword",
+    name: "Bound Sword",
+    school: "Conjuration",
+    rank: "apprentice",
+    element: "summon",
+    minDamage: SPELL_BASE.apprentice.dmg[0],
+    maxDamage: SPELL_BASE.apprentice.dmg[1],
+    baseCost: SPELL_BASE.apprentice.cost + 4
+  },
+  conjure_flame_atronach: {
+    id: "conjure_flame_atronach",
+    name: "Conjure Flame Atronach",
+    school: "Conjuration",
+    rank: "apprentice",
+    element: "summon",
+    minDamage: SPELL_BASE.apprentice.dmg[0],
+    maxDamage: SPELL_BASE.apprentice.dmg[1],
+    baseCost: SPELL_BASE.apprentice.cost + 6
+  },
+  conjure_frost_atronach: {
+    id: "conjure_frost_atronach",
+    name: "Conjure Frost Atronach",
+    school: "Conjuration",
+    rank: "adept",
+    element: "summon",
+    minDamage: SPELL_BASE.adept.dmg[0],
+    maxDamage: SPELL_BASE.adept.dmg[1],
+    baseCost: SPELL_BASE.adept.cost + 6
+  },
+  conjure_storm_atronach: {
+    id: "conjure_storm_atronach",
+    name: "Conjure Storm Atronach",
+    school: "Conjuration",
+    rank: "expert",
+    element: "summon",
+    minDamage: SPELL_BASE.expert.dmg[0],
+    maxDamage: SPELL_BASE.expert.dmg[1],
+    baseCost: SPELL_BASE.expert.cost + 8
+  },
+  conjure_dremora_lord: {
+    id: "conjure_dremora_lord",
+    name: "Conjure Dremora Lord",
+    school: "Conjuration",
+    rank: "master",
+    element: "summon",
+    minDamage: SPELL_BASE.master.dmg[0],
+    maxDamage: SPELL_BASE.master.dmg[1],
+    baseCost: SPELL_BASE.master.cost + 10
+  },
+
+  // --- Alteration: treat as defensive "damage equivalent" for now ---
+  oakflesh: {
+    id: "oakflesh",
+    name: "Oakflesh",
+    school: "Alteration",
+    rank: "novice",
+    element: "armor",
+    minDamage: 0,
+    maxDamage: 0,
+    baseCost: 14
+  },
+  stoneflesh: {
+    id: "stoneflesh",
+    name: "Stoneflesh",
+    school: "Alteration",
+    rank: "apprentice",
+    element: "armor",
+    minDamage: 0,
+    maxDamage: 0,
+    baseCost: 28
+  },
+  ebonyflesh: {
+    id: "ebonyflesh",
+    name: "Ebonyflesh",
+    school: "Alteration",
+    rank: "adept",
+    element: "armor",
+    minDamage: 0,
+    maxDamage: 0,
+    baseCost: 40
+  },
+  dragonhide: {
+    id: "dragonhide",
+    name: "Dragonhide",
+    school: "Alteration",
+    rank: "master",
+    element: "armor",
+    minDamage: 0,
+    maxDamage: 0,
+    baseCost: 80
+  }
 };
 
 const RACES = {
@@ -1376,7 +1646,19 @@ const CITIES = {
   markarth:{id:"markarth",name:"Markarth",hold:"The Reach",x:-4,y:-1,zone:2}
 };
 
-const R_LABEL = {common:"Common",fine:"Fine",superior:"Superior",epic:"Epic"};
+// somewhere in your R_LABEL definition:
+const R_LABEL = {
+  common:   "Common",
+  rare:     "Rare",
+  epic:     "Epic",
+  //
+  novice:     "Novice",
+  apprentice: "Apprentice",
+  adept:      "Adept",
+  expert:     "Expert",
+  master:     "Master"
+};
+
 
 const AMULET_TRAITS = {
   common:{name:"Minor Fortitude",key:"potionBonus",value:.1,desc:"+10% potion effectiveness."},
@@ -2041,6 +2323,31 @@ const TIER_DIFFICULTY_MULT = {
   2: 1.25, // elites
   3: 1.5   // bosses / scary stuff
 };
+// === SPELL RANKS (for magic only) ===
+const SPELL_RANKS = ["novice", "apprentice", "adept", "expert", "master"];
+
+const SPELL_RANK_LABEL = {
+  novice:     "Novice",
+  apprentice: "Apprentice",
+  adept:      "Adept",
+  expert:     "Expert",
+  master:     "Master"
+};
+
+// How much stronger each rank is vs base
+const SPELL_RANK_MULT = {
+  novice:     1.0,
+  apprentice: 1.35,
+  adept:      1.8,
+  expert:     2.3,
+  master:     3.0
+};
+
+// Helper: rank index (for upgrading)
+function spellRankIndex(r){
+  const i = SPELL_RANKS.indexOf(r);
+  return i === -1 ? 0 : i;
+}
 // === STAMINA BALANCING ===
 
 // Global multiplier on stamina cost for basic attacks
@@ -3229,7 +3536,8 @@ function updateSpells(){
 
     const meta = document.createElement("div");
     meta.className = "shout-meta";
-    meta.textContent = `DMG ${def.minDamage}-${def.maxDamage} • Cost ${def.baseCost}`;
+    const rankLab = SPELL_RANK_LABEL[entry.rarity] || "Novice";
+    meta.textContent = `${rankLab} • DMG ${def.minDamage}-${def.maxDamage} • Cost ${def.baseCost}`;
 
     const btn = document.createElement("button");
     btn.className = "action-btn small";
@@ -3645,29 +3953,60 @@ function awardPots(){
   if(m.length)logMsg(`You also find: <strong>${m.join(", ")}</strong>.`,"loot");
 }
 
-function learnSpellFromBook(spellId,rarity){
-  const def=SPELLS[spellId];if(!def)return;
-  const ps=STATE.player.spells||(STATE.player.spells={known:[],equipped:null});
-  let cur=ps.known.find(s=>s.id===spellId);
-  const lab=R_LABEL[rarity]||"Common";
-  if(!cur){
-    ps.known.push({id:spellId,rarity});if(!ps.equipped)ps.equipped=spellId;
-    logMsg(`You study a newly found spellbook and learn <strong>${def.name}</strong> (${lab}).`,"loot");
-  }else{
-    if(rarityRank(rarity)>rarityRank(cur.rarity)){
-      const oldLab=R_LABEL[cur.rarity]||"Common";cur.rarity=rarity;
-      logMsg(`You pore over an advanced tome of <strong>${def.name}</strong>, upgrading it from ${oldLab} to <strong>${lab}</strong>.`,"loot");
-    }else{
-      logMsg(`You skim a familiar spellbook of <strong>${def.name}</strong>, but learn nothing new.`,"loot");
+function learnSpellFromBook(spellId, rank){
+  const def = SPELLS[spellId];
+  if (!def) return;
+
+  // fallback: any weird value becomes novice
+  if (!SPELL_RANKS.includes(rank)) rank = "novice";
+
+  const ps = STATE.player.spells || (STATE.player.spells = { known:[], equipped:null });
+  let cur = ps.known.find(s => s.id === spellId);
+  const lab = SPELL_RANK_LABEL[rank] || "Novice";
+
+  if (!cur) {
+    // First time learning this spell
+    ps.known.push({ id: spellId, rarity: rank });
+    if (!ps.equipped) ps.equipped = spellId;
+
+    logMsg(
+      `You study a newly found spellbook and learn <strong>${def.name}</strong> (${lab}).`,
+      "loot"
+    );
+  } else {
+    // Upgrade only if this book is a higher rank than current
+    if (spellRankIndex(rank) > spellRankIndex(cur.rarity)) {
+      const oldLab = SPELL_RANK_LABEL[cur.rarity] || "Novice";
+      cur.rarity = rank;
+
+      logMsg(
+        `You pore over an advanced tome of <strong>${def.name}</strong>, upgrading it from ${oldLab} to <strong>${lab}</strong>.`,
+        "loot"
+      );
+    } else {
+      logMsg(
+        `You skim a familiar spellbook of <strong>${def.name}</strong>, but learn nothing new.`,
+        "loot"
+      );
     }
   }
 }
 
 function maybeSpellbookDrop(){
-  if(Math.random()<.22){
-    const ids=Object.keys(SPELLS);const sid=ids[randInt(0,ids.length-1)];
-    const rar=RARITY_ORDER[randInt(0,RARITY_ORDER.length-1)];
-    learnSpellFromBook(sid,rar);
+  if (Math.random() < 0.22){
+    const ids = Object.keys(SPELLS);
+    const sid = ids[randInt(0, ids.length - 1)];
+
+    // Weighted rank selection (more Novice, rare Master)
+    const roll = Math.random();
+    let rank = "novice";
+    if      (roll < 0.45) rank = "novice";
+    else if (roll < 0.75) rank = "apprentice";
+    else if (roll < 0.90) rank = "adept";
+    else if (roll < 0.97) rank = "expert";
+    else                  rank = "master";
+
+    learnSpellFromBook(sid, rank);
   }
 }
 
@@ -5969,6 +6308,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
