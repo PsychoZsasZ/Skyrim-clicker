@@ -1911,6 +1911,54 @@ function traitSummary(slot,r){
 
 function rollRarity(){let r=Math.random()*100;return r<55?"common":r<80?"fine":r<95?"superior":"epic"}
 
+  // === JEWELLERY GENERATION ===
+
+// Some flavour prefixes for jewellery
+const RING_STYLES = [
+  "Silver", "Gold", "Orichalcum", "Moonstone",
+  "Onyx", "Garnet", "Amethyst", "Emerald", "Ruby"
+];
+
+const AMULET_STYLES = [
+  "Silver", "Gold", "Jeweled", "Runed",
+  "Bone", "Nordic", "Ornate", "Engraved"
+];
+
+// Optional: tiny stat hints for higher rarity jewellery
+function jewelryBaseValueForRarity(rarity, tier){
+  let base = 25 + tier * 8;
+  if (rarity === "fine"   || rarity === "rare")  base *= 1.4;
+  if (rarity === "superior")                     base *= 1.8;
+  if (rarity === "epic")                         base *= 2.4;
+  return Math.round(base);
+}
+
+function makeJewelry(slot, tier, rarity){
+  const isRing   = slot === "ring";
+  const styles   = isRing ? RING_STYLES : AMULET_STYLES;
+  const style    = styles[randInt(0, styles.length - 1)];
+
+  // Basic name like "Gold Ring" / "Jeweled Amulet"
+  const baseName = isRing ? "Ring" : "Amulet";
+  const name     = `${style} ${baseName}`;
+
+  // Jewellery doesn't use armor in your design; traits make them strong.
+  // We still return armor = 0 so your existing code can safely ignore or delete it.
+  const armor = 0;
+
+  // Base gold value based on tier & rarity
+  const value = jewelryBaseValueForRarity(rarity, tier);
+
+  return {
+    slot,              // "ring" or "amulet"
+    name,
+    rarity,            // same rarity string you're already using
+    damage: null,
+    armor,
+    value
+  };
+}
+
 // forcedRarity is optional; if passed, we always use that (e.g. "epic")
 function makeLoot(zone, forcedRarity){
   const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
@@ -2124,7 +2172,7 @@ window.spawnTestShield = function(){
 
 const STATE = {
   player:{
-    name:"Dragonborn",
+    name:"Dragonborn", // this is where the player stats are 
     maxHealth:100,health:100,maxStamina:60,stamina:60,maxMagicka:50,magicka:50,
     level:1,xp:0,xpToNext:25,gold:0,
     potions:{health:3,stamina:1,magicka:0},selectedPotion:"health",zone:1,
@@ -5683,12 +5731,19 @@ function genShop(cityId){
   while (offers.length < numOffers && safety < 120) {
     safety++;
 
-    // Rarity weighting: mostly common/rare, occasional epic
-    const rRoll = Math.random();
-    let forcedRarity;
-    if      (rRoll < 0.55) forcedRarity = "common";
-    else if (rRoll < 0.85) forcedRarity = "rare";
-    else                   forcedRarity = "epic";
+    // Rarity weighting: common > fine > superior > rare epic
+const rRoll = Math.random();
+let forcedRarity;
+
+if (rRoll < 0.55) {
+  forcedRarity = "common";      // 55%
+} else if (rRoll < 0.85) {
+  forcedRarity = "fine";        // 30%
+} else if (rRoll < 0.97) {
+  forcedRarity = "superior";    // 12%
+} else {
+  forcedRarity = "epic";        // 3%
+}
 
     let it;
 
@@ -6637,6 +6692,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
