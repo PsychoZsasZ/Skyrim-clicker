@@ -2026,6 +2026,73 @@ const ENEMIES=[ /* unchanged enemy data from your file */
 ];
 
 const E_ZONE={1:ENEMIES.filter(e=>e.tier===1),2:ENEMIES.filter(e=>e.tier===2),3:ENEMIES.filter(e=>e.tier===3)};
+// === BALANCING CONSTANTS ===
+
+// How much enemies grow per player level above 1
+const ENEMY_HP_PER_LEVEL  = 0.25;  // +25% HP per level
+const ENEMY_DMG_PER_LEVEL = 0.12;  // +12% damage per level
+
+// Global difficulty modifier (1 = vanilla, >1 = harder)
+const GLOBAL_DIFFICULTY_MOD = 1.2;
+
+// Extra multipliers by tier (on top of the base stats you already set)
+const TIER_DIFFICULTY_MULT = {
+  1: 1.0,  // trash
+  2: 1.25, // elites
+  3: 1.5   // bosses / scary stuff
+};
+// === PLAYER DAMAGE BALANCING ===
+
+// Global multiplier on all player basic attacks
+// (lower than 1.0 to make enemies tougher)
+const PLAYER_DAMAGE_MOD = 0.7; // 70% of previous damage
+
+// Extra reduction vs tougher tiers (on top of global mod)
+const PLAYER_VS_TIER_MOD = {
+  1: 1.0,  // normal vs trash
+  2: 0.9,  // -10% vs elites
+  3: 0.8   // -20% vs bosses / endgame
+};
+
+// Turn a base ENEMIES template into a scaled instance for the current player
+function createScaledEnemy(baseEnemy) {
+  const p = STATE.player || { level: 1 };
+  const lvl = Math.max(1, p.level || 1);
+  const levelDelta = Math.max(0, lvl - 1);
+
+  const tier = baseEnemy.tier || 1;
+  const tierMult = TIER_DIFFICULTY_MULT[tier] || 1.0;
+
+  const hpMult  = (1 + ENEMY_HP_PER_LEVEL  * levelDelta) * tierMult * GLOBAL_DIFFICULTY_MOD;
+  const dmgMult = (1 + ENEMY_DMG_PER_LEVEL * levelDelta) * tierMult * GLOBAL_DIFFICULTY_MOD;
+
+  const baseHp   = baseEnemy.maxHealth || 10;
+  const baseMinD = baseEnemy.minDamage  || 1;
+  const baseMaxD = baseEnemy.maxDamage  || baseMinD + 2;
+
+  const scaledHp   = Math.round(baseHp * hpMult);
+  const scaledMinD = Math.max(1, Math.round(baseMinD * dmgMult));
+  const scaledMaxD = Math.max(scaledMinD, Math.round(baseMaxD * dmgMult));
+
+  // Scale gold range a bit with difficulty/level, but not crazy
+  const baseGoldMin = Array.isArray(baseEnemy.gold) ? baseEnemy.gold[0] : (baseEnemy.gold || 1);
+  const baseGoldMax = Array.isArray(baseEnemy.gold) ? baseEnemy.gold[1] : (baseEnemy.gold || 3);
+  const rewardMult  = 1 + 0.06 * levelDelta; // +6% per level
+
+  const goldMin = Math.round(baseGoldMin * rewardMult * tierMult);
+  const goldMax = Math.round(baseGoldMax * rewardMult * tierMult);
+
+  return {
+    ...baseEnemy, // keep id/name/group/tier/etc.
+    // scaled combat stats
+    maxHealth: scaledHp,
+    currentHealth: scaledHp, // if you use this
+    minDamage: scaledMinD,
+    maxDamage: scaledMaxD,
+    // scaled rewards
+    gold: [goldMin, goldMax]
+  };
+}
 
 function regionName(x,y){if(y<-2)return"The Rift";if(y>2)return"Haafingar";if(x<-2)return"The Reach";if(x>2)return"Eastmarch";return"Whiterun Hold"}
 
@@ -3791,7 +3858,7 @@ function startCombat(){
         if (base) {
           const boosted = { ...base };
 
-          // Make the cave version nastier
+          // Make the cave version nastier (on top of normal scaling)
           boosted.maxHealth = Math.round(base.maxHealth * 1.35);
           boosted.minDamage = Math.round(base.minDamage * 1.2);
           boosted.maxDamage = Math.round(base.maxDamage * 1.2);
@@ -3812,9 +3879,16 @@ function startCombat(){
     enemyDef = def;
   }
 
-  const enemy = { ...enemyDef, health: enemyDef.maxHealth };
+  // ✅ NEW: scale the enemy based on player level & tier
+  const scaledEnemy = createScaledEnemy(enemyDef);
 
-    // --- Travel buffs/debuffs for this battle ---
+  // Use scaled stats in combat
+  const enemy = { 
+    ...scaledEnemy,
+    health: scaledEnemy.maxHealth  // your combat HP field
+  };
+
+  // --- Travel buffs/debuffs for this battle ---
   STATE.combat.enemy = enemy;
   STATE.combat.inCombat = true;
   STATE.combat.playerBlocking = false;
@@ -4180,9 +4254,11 @@ function pAttack(){
   const e = STATE.combat.enemy;
   const p = STATE.player;
   const weapon = p.equipment?.weapon || null;
-  const wt = (weapon && weapon.weaponType && WEAPON_TYPES[weapon.weaponType]) ? WEAPON_TYPES[weapon.weaponType] : WEAPON_TYPES.sword;
+  const wt = (weapon && weapon.weaponType && WEAPON_TYPES[weapon.weaponType])
+    ? WEAPON_TYPES[weapon.weaponType]
+    : WEAPON_TYPES.sword;
 
-   const staminaCost = wt.staminaCost != null ? wt.staminaCost : 6;
+  const staminaCost = wt.staminaCost != null ? wt.staminaCost : 6;
 
   // Blizzard makes attacks more tiring
   let finalStaminaCost = staminaCost;
@@ -4204,7 +4280,10 @@ function pAttack(){
   if (wt.critBonus) critChance += wt.critBonus;
 
   // Base damage from weapon + type multiplier
-  let base = Math.max(4, Math.round(weaponDmg() * (wt.damageMult || 1) + randInt(-2, 2)));
+  let base = Math.max(
+    4,
+    Math.round(weaponDmg() * (wt.damageMult || 1) + randInt(-2, 2))
+  );
 
   let crit = false;
   if (Math.random() < critChance) {
@@ -4225,10 +4304,16 @@ function pAttack(){
     glancing = true;
     dmg = Math.max(1, Math.round(dmg * (wt.glanceMult || 0.7)));
   }
+
   // Shrine blessing: increase your damage this fight
   if (STATE.combat && STATE.combat.shrineBoost) {
     dmg = Math.round(dmg * 1.2); // +20% damage
   }
+
+  // ✅ NEW: apply global + tier-based damage scaling
+  const tier = e.tier || 1;
+  const tierMod = PLAYER_VS_TIER_MOD[tier] || 1.0;
+  dmg = Math.max(1, Math.round(dmg * PLAYER_DAMAGE_MOD * tierMod));
 
   p.stamina = clamp(p.stamina - finalStaminaCost, 0, p.maxStamina);
   e.health = clamp(e.health - dmg, 0, e.maxHealth);
@@ -4253,9 +4338,14 @@ function pAttack(){
   // Axes & battleaxes: bleed
   if (wt.bleedChance && e.health > 0 && Math.random() < wt.bleedChance) {
     const bleed = randInt(wt.bleedMin || 3, wt.bleedMax || 7);
+
+    // ✅ Bleed should also respect caps, but can be unscaled to feel strong
     e.health = clamp(e.health - bleed, 0, e.maxHealth);
     updateEnemyPreview();
-    logMsg(`The wound from your <strong>${wName}</strong> <strong>bleeds</strong> for an additional <strong>${bleed}</strong> damage.`, "system");
+    logMsg(
+      `The wound from your <strong>${wName}</strong> <strong>bleeds</strong> for an additional <strong>${bleed}</strong> damage.`,
+      "system"
+    );
   }
 
   updateBars();
@@ -4270,14 +4360,20 @@ function pAttack(){
 
   // Warhammers: chance to stagger (skip enemy turn)
   if (wt.staggerChance && Math.random() < wt.staggerChance) {
-    logMsg(`Your heavy blow with the <strong>${wName}</strong> <strong>staggers</strong> the ${e.name}, preventing a counter-attack!`, "enemy");
+    logMsg(
+      `Your heavy blow with the <strong>${wName}</strong> <strong>staggers</strong> the ${e.name}, preventing a counter-attack!`,
+      "enemy"
+    );
     saveGame();
     return;
   }
 
   // Bows / crossbows: sometimes deny counter-attacks by staying at range
   if (wt.skipCounterChance && Math.random() < wt.skipCounterChance) {
-    logMsg(`You keep your distance with your <strong>${wName}</strong>, denying the ${e.name} a clean counter-attack.`, "enemy");
+    logMsg(
+      `You keep your distance with your <strong>${wName}</strong>, denying the ${e.name} a clean counter-attack.`,
+      "enemy"
+    );
     saveGame();
     return;
   }
@@ -5805,6 +5901,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
