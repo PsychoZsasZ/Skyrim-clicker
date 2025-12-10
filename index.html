@@ -5456,13 +5456,53 @@ function equipShout(id){
   saveGame();
 }
 
-function genShop(id){
-  const z=STATE.player.zone,it=[],c=4+randInt(0,2);for(let i=0;i<c;i++){
-    const item=makeLoot(z);const price=item.value?Math.round(item.value*1.35):20;it.push({...item,price});
-  }
-  STATE.shop.items=it;
-}
+function genShop(cityId){
+  const p = STATE.player || { level: 1, zone: 1 };
+  if (!STATE.shop) STATE.shop = {};
 
+  const city = CITIES[cityId];
+  let tier = city && city.zone ? city.zone : (p.zone || 1);
+  tier = clamp(tier, 1, 3);
+
+  const level = p.level || 1;
+
+  // Number of offers scales with level (but capped)
+  let numOffers = 4 + Math.floor(level / 3);
+  numOffers = clamp(numOffers, 4, 10);
+
+  const offers = [];
+  let safety = 0;
+
+  while (offers.length < numOffers && safety < 100) {
+    safety++;
+
+    // Rarity weighting: mostly common/rare, occasional epic
+    const rRoll = Math.random();
+    let forcedRarity;
+    if (rRoll < 0.55)      forcedRarity = "common";
+    else if (rRoll < 0.85) forcedRarity = "rare";
+    else                   forcedRarity = "epic";
+
+    const it = makeLoot(tier, forcedRarity);
+    if (!it) continue;
+
+    // Avoid exact duplicates by name + slot
+    if (offers.some(o => o.name === it.name && o.slot === it.slot)) {
+      continue;
+    }
+
+    // Convert item value → shop price (slightly greedy)
+    const baseValue = it.value != null ? it.value : 10;
+    const priceMult = 1.15 + 0.04 * tier;      // higher tier cities charge more
+    const greed     = 1 + 0.01 * level;        // a bit pricier as you level
+
+    it.price = Math.max(5, Math.round(baseValue * priceMult * greed));
+
+    offers.push(it);
+  }
+
+  STATE.shop.items = offers;
+}
  
 function fastTravel(id){
   if (STATE.combat.inCombat){
@@ -5921,7 +5961,10 @@ function openCityShop(){
 // Riften-only shady shop
 function riftenBlackMarket(){
   if (!inCity()){
-    logMsg("You need to be inside a city to find anyone willing to trade in stolen goods.","system");
+    logMsg(
+      "You need to be inside a city to find anyone willing to trade in stolen goods.",
+      "system"
+    );
     return;
   }
   if (STATE.combat.inCombat) return;
@@ -5937,14 +5980,17 @@ function riftenBlackMarket(){
 
   if (!STATE.shop) STATE.shop = { items:[], isBlackMarket:false };
 
-  const p = STATE.player;
-  const skills = p.skills || {};
+  const p          = STATE.player;
+  const skills     = p.skills || {};
   const thiefSkill = skills.thief || 0;
 
   const baseTier = Math.min(3, Math.max(1, p.zone || 1));
+  const level    = p.level || 1;
+
   const stock = [];
 
-  const makeOffer = (slot, name, rarity, statKey, statValue, basePrice) => {
+  // --- Helper to push a custom “signature” item ---
+  const pushCustomItem = (slot, name, rarity, statKey, statValue, basePrice) => {
     const offer = {
       slot,
       name,
@@ -5959,55 +6005,103 @@ function riftenBlackMarket(){
     stock.push(offer);
   };
 
-  const z = baseTier;
+  const z          = baseTier;
   const dmgScale   = 6 + z * 4;
   const armorScale = 8 + z * 5;
 
-  makeOffer(
-    "weapon",
-    "Shadowglass Dagger",
-    "superior",
-    "damage",
-    dmgScale + 4,
-    80 + z * 25
-  );
+  // --- Signature black market pieces (CHANCE to appear) ---
+  if (Math.random() < 0.7) {
+    pushCustomItem(
+      "weapon",
+      "Shadowglass Dagger",
+      "superior",
+      "damage",
+      dmgScale + 4,
+      80 + z * 25
+    );
+  }
 
-  makeOffer(
-    "ring",
-    "Ring of the Footpad",
-    "fine",
-    "armor",
-    0,
-    70 + z * 20
-  );
+  if (Math.random() < 0.55) {
+    pushCustomItem(
+      "ring",
+      "Ring of the Footpad",
+      "fine",
+      "armor",
+      0,
+      70 + z * 20
+    );
+  }
 
-  makeOffer(
-    "amulet",
-    "Amulet of Whispers",
-    "superior",
-    "armor",
-    0,
-    90 + z * 25
-  );
+  if (Math.random() < 0.5) {
+    pushCustomItem(
+      "amulet",
+      "Amulet of Whispers",
+      "superior",
+      "armor",
+      0,
+      90 + z * 25
+    );
+  }
 
-  makeOffer(
-    "chest",
-    "Blackguard's Leathers",
-    "epic",
-    "armor",
-    armorScale + 6,
-    120 + z * 35
-  );
+  if (Math.random() < 0.65) {
+    pushCustomItem(
+      "chest",
+      "Blackguard's Leathers",
+      "epic",
+      "armor",
+      armorScale + 6,
+      120 + z * 35
+    );
+  }
 
-  const discount = Math.min(0.25, thiefSkill * 0.02);
+  // --- Random extra contraband using your normal loot generator ---
+  // Target total offers: scales a bit with level
+  let targetOffers = 4 + Math.floor(level / 5); // 4–8 roughly
+  targetOffers = clamp(targetOffers, 4, 8);
+
+  let safety = 0;
+  while (stock.length < targetOffers && safety < 80) {
+    safety++;
+
+    // Black market rarity bias: mostly rare/epic
+    const roll = Math.random();
+    let forcedRarity;
+    if      (roll < 0.20) forcedRarity = "common";   // sometimes trash
+    else if (roll < 0.55) forcedRarity = "rare";
+    else                  forcedRarity = "epic";
+
+    const it = makeLoot(z, forcedRarity);
+    if (!it) continue;
+
+    // Avoid duplicates by name + slot
+    if (stock.some(o => o.name === it.name && o.slot === it.slot)) {
+      continue;
+    }
+
+    // Base shop price from item value
+    const baseValue = it.value != null ? it.value : 20;
+    const priceMult = 1.4 + 0.05 * z;           // steeper markup than normal shops
+    const greed     = 1.25 + 0.02 * level;      // nastier with your level
+
+    it.price = Math.max(10, Math.round(baseValue * priceMult * greed));
+
+    // Tag as black market if you want to treat these differently later
+    it.blackMarket = true;
+
+    stock.push(it);
+  }
+
+  // --- Apply thief discount to everything ---
+  const discount = Math.min(0.25, thiefSkill * 0.02); // max 25%
   if (discount > 0){
     stock.forEach(it => {
-      it.price = Math.max(1, Math.round(it.price * (1 - discount)));
+      const base = it.price != null ? it.price : it.value || 10;
+      it.price = Math.max(1, Math.round(base * (1 - discount)));
       it.value = it.price;
     });
   }
 
-  STATE.shop.items = stock;
+  STATE.shop.items        = stock;
   STATE.shop.isBlackMarket = true;
 
   logMsg(
@@ -6308,6 +6402,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
