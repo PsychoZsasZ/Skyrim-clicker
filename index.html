@@ -2348,6 +2348,7 @@ function spellRankIndex(r){
   const i = SPELL_RANKS.indexOf(r);
   return i === -1 ? 0 : i;
 }
+
 // === STAMINA BALANCING ===
 
 // Global multiplier on stamina cost for basic attacks
@@ -2368,6 +2369,76 @@ const PLAYER_VS_TIER_MOD = {
   2: 0.9,  // -10% vs elites
   3: 0.8   // -20% vs bosses / endgame
 };
+// === ARMOR MATERIAL POOLS ===
+
+// Light armor (common)
+const LIGHT_ARMOR_MATERIALS_COMMON = [
+  "Hide",
+  "Fur",
+  "Leather",
+  "Elven",
+  "Chitin",
+  "Scaled",
+  "Glass",
+  "Stalhrim",
+  "Dragonscale",
+  "Skaal",
+  "Penitus Oculatus"
+];
+
+// Light armor (unique / quest related)
+const LIGHT_ARMOR_MATERIALS_UNIQUE = [
+  "Nightingale",
+  "Thieves Guild",
+  "Ancient Shrouded",
+  "Armor of the Old Gods",
+  "Linwe's",
+  "Deathbrand",
+  "Morag Tong"
+];
+
+// Heavy armor (common)
+const HEAVY_ARMOR_MATERIALS_COMMON = [
+  "Iron",
+  "Steel",
+  "Dwarven",
+  "Orcish",
+  "Ebony",
+  "Dragonplate",
+  "Nordic Carved",
+  "Ancient Nord",
+  "Imperial",
+  "Falmer",
+  "Hardened Falmer"
+];
+
+// Heavy armor (unique / quest related)
+const HEAVY_ARMOR_MATERIALS_UNIQUE = [
+  "Dawnguard",
+  "Blades",
+  "Wolf",
+  "Ahzidal's",
+  "Blackguard's",
+  "General Tullius'",
+  "Jagged Crown"
+];
+  // === ARMOR MITIGATION ===
+// Converts a flat armor rating into a % damage reduction with diminishing returns.
+function armorMitigation(armor, forCompanion = false){
+  const A = Math.max(0, armor || 0);
+
+  // Bigger scale = slower ramp. Player gets slightly better scaling.
+  const scale = forCompanion ? 70 : 80;
+
+  // Diminishing returns: red = A / (A + scale)
+  let red = A / (A + scale);
+
+  // Caps so you can never become fully immune
+  const cap = forCompanion ? 0.65 : 0.75;
+  if (red > cap) red = cap;
+
+  return red;
+}
 
 // Turn a base ENEMIES template into a scaled instance for the current player
 function createScaledEnemy(baseEnemy) {
@@ -4347,18 +4418,18 @@ function enemyTurn(){
   // Each enemy action advances shout cooldown
   tickShoutCooldown();
 
-  const target = chooseEnemyTarget();
+  const target   = chooseEnemyTarget();
   const isPlayer = (target === "player");
-  const p = STATE.player;
-  const comp = getActiveCompanion();
-  const thief = STATE.player.skills?.thief || 0;
+  const p        = STATE.player;
+  const comp     = getActiveCompanion();
+  const thief    = STATE.player.skills?.thief || 0;
 
   const blocking = isPlayer && !!STATE.combat.playerBlocking;
-  const prof = blocking ? (STATE.combat.blockProfile || currentShieldProfile()) : null;
+  const prof     = blocking ? (STATE.combat.blockProfile || currentShieldProfile()) : null;
 
   // --- DRAGON BREATH SETUP ---
   const isDragon = enemy.group === "Dragon" || enemy.type === "Dragon";
-  let isBreath = false;
+  let isBreath   = false;
   let breathType = null; // "fire" | "frost" | null
 
   if (isDragon && Math.random() < 0.4) { // 40% chance this turn is a breath attack
@@ -4378,7 +4449,7 @@ function enemyTurn(){
   }
 
   const thiefBonus = isPlayer ? 0.02 * thief : 0;
-  const miss = missBase + thiefBonus;
+  const miss       = missBase + thiefBonus;
 
   if (Math.random() < miss) {
     if (isPlayer) {
@@ -4393,7 +4464,7 @@ function enemyTurn(){
       );
     }
     STATE.combat.playerBlocking = false;
-    STATE.combat.blockProfile = null;
+    STATE.combat.blockProfile   = null;
     saveGame();
     return;
   }
@@ -4404,25 +4475,32 @@ function enemyTurn(){
     dmg = Math.round(dmg * (breathType === "frost" ? 1.15 : 1.25));
   }
 
+  // --- ARMOR / BLOCK MITIGATION ---
   let red = 0;
 
   if (isPlayer) {
-    red = armorRating() / 60;
+    // Base reduction from your armor rating with diminishing returns
+    const a = armorRating();
+    red = armorMitigation(a, false);
 
-    // shield / guard reduction
+    // Shield / guard reduction on top
     if (blocking) {
       const shieldBlock = prof ? prof.blockBonus : 0.20;
       red += shieldBlock;
     }
 
-    // thief mitigation
+    // Thief skill: a bit of extra mitigation (dodging, rolling, etc.)
     red += 0.02 * thief;
 
-    // higher cap because shields exist
-    red = Math.min(0.8, red);
+    // Final hard cap so nothing gets too silly
+    red = Math.min(0.85, red);
+
   } else {
-    // companion armor, slightly lower cap
-    red = companionArmorRating() / 65;
+    // Companion armor: slightly worse scaling
+    const a = companionArmorRating();
+    red = armorMitigation(a, true);
+
+    // Extra safety cap
     red = Math.min(0.75, red);
   }
 
@@ -4440,11 +4518,12 @@ function enemyTurn(){
       "enemy"
     );
     STATE.combat.playerBlocking = false;
-    STATE.combat.blockProfile = null;
+    STATE.combat.blockProfile   = null;
     saveGame();
     return;
   }
 
+  // Apply mitigation
   dmg = Math.max(1, Math.round(dmg * (1 - red)));
 
   if (isPlayer) {
@@ -4474,7 +4553,7 @@ function enemyTurn(){
         dmg > 0
       ) {
         const maxRef = prof.special.reflectDamage;
-        const ref = randInt(1, maxRef);
+        const ref    = randInt(1, maxRef);
         enemy.health = clamp(enemy.health - ref, 0, enemy.maxHealth);
         updateEnemyPreview();
         logMsg(
@@ -4524,7 +4603,7 @@ function enemyTurn(){
 
     if (p.health <= 0) {
       STATE.combat.playerBlocking = false;
-      STATE.combat.blockProfile = null;
+      STATE.combat.blockProfile   = null;
       onDeath();
       return;
     }
@@ -4557,7 +4636,7 @@ function enemyTurn(){
   }
 
   STATE.combat.playerBlocking = false;
-  STATE.combat.blockProfile = null;
+  STATE.combat.blockProfile   = null;
 
   updateBars();
   saveGame();
@@ -5456,6 +5535,103 @@ function equipShout(id){
   saveGame();
 }
 
+// Simple city shop theme – which cities lean light/heavy & style
+function cityShopTheme(cityId){
+  switch(cityId){
+    case "whiterun":
+      return { prefWeight: "heavy" };             // steel / nordic vibe
+    case "solitude":
+      return { prefWeight: "light" };             // elven / glass styles
+    case "windhelm":
+      return { prefWeight: "heavy" };             // ancient nord / heavy
+    case "markarth":
+      return { prefWeight: "heavy" };             // dwarven / orcish
+    case "riften":
+      return { prefWeight: "light" };             // thieves guild / nightingale
+    default:
+      return { prefWeight: null };
+  }
+}
+
+// Pick a material based on tier, weight, uniqueness
+function pickArmorMaterial(tier, weight, isUnique){
+  let pool;
+
+  if (weight === "light") {
+    if (isUnique) pool = LIGHT_ARMOR_MATERIALS_UNIQUE;
+    else pool = LIGHT_ARMOR_MATERIALS_COMMON;
+  } else {
+    if (isUnique) pool = HEAVY_ARMOR_MATERIALS_UNIQUE;
+    else pool = HEAVY_ARMOR_MATERIALS_COMMON;
+  }
+
+  if (!pool || !pool.length) return null;
+
+  // bias higher tiers toward the later materials
+  const idxBase = Math.floor(Math.random() * pool.length);
+  const offset  = tier - 1;
+  const idx     = (idxBase + offset) % pool.length;
+
+  return pool[idx];
+}
+
+// Make a themed armor item for shops (light/heavy chest/boots)
+function makeShopArmor(tier, rarity, theme){
+  const weightPref = theme && theme.prefWeight;
+  const weight = weightPref || (Math.random() < 0.5 ? "light" : "heavy");
+
+  const slot = Math.random() < 0.7 ? "chest" : "boots"; // more chest pieces than boots
+  const isUnique = (rarity === "epic");
+
+  const material = pickArmorMaterial(tier, weight, isUnique);
+  if (!material) return null;
+
+  // Base armor values by tier & weight
+  const tierIndex = clamp(tier, 1, 3) - 1;
+  const lightBase = [12, 20, 30];
+  const heavyBase = [18, 26, 38];
+
+  let armor = (weight === "light" ? lightBase[tierIndex] : heavyBase[tierIndex]);
+
+  // Rarity modifier
+  let rMult = 1.0;
+  if (rarity === "rare") rMult = 1.15;
+  else if (rarity === "epic") rMult = 1.35;
+
+  armor = Math.round(armor * rMult);
+
+  if (slot === "boots") {
+    armor = Math.max(1, Math.round(armor * 0.6));
+  }
+
+  // Value roughly tied to armor & tier
+  let value = 35 + armor * 3 + tier * 10;
+  if (rarity === "rare") value *= 1.2;
+  if (rarity === "epic") value *= 1.5;
+  value = Math.round(value);
+
+  const pieceName = slot === "chest" ? "Armor" : "Boots";
+  let name;
+
+  // Make some of the iconic ones nicer-sounding
+  if (material === "Nightingale")        name = "Nightingale " + pieceName;
+  else if (material === "Thieves Guild") name = "Thieves Guild " + pieceName;
+  else if (material === "Armor of the Old Gods") name = "Armor of the Old Gods";
+  else if (material === "Deathbrand")    name = "Deathbrand " + pieceName;
+  else if (material === "Blackguard's")  name = "Blackguard's " + pieceName;
+  else if (material === "Jagged Crown")  name = "Jagged Crown"; // treat as chest
+  else name = material + " " + pieceName;
+
+  return {
+    slot,
+    name,
+    rarity,          // "common" / "rare" / "epic" (your existing rarities)
+    armor,
+    damage: null,
+    value
+  };
+}
+
 function genShop(cityId){
   const p = STATE.player || { level: 1, zone: 1 };
   if (!STATE.shop) STATE.shop = {};
@@ -5467,23 +5643,35 @@ function genShop(cityId){
   const level = p.level || 1;
 
   // Number of offers scales with level (but capped)
-  let numOffers = 4 + Math.floor(level / 3);
-  numOffers = clamp(numOffers, 4, 10);
+  let numOffers = 5 + Math.floor(level / 3);
+  numOffers = clamp(numOffers, 5, 12);
 
+  const theme  = cityShopTheme(cityId);
   const offers = [];
-  let safety = 0;
+  let safety   = 0;
 
-  while (offers.length < numOffers && safety < 100) {
+  while (offers.length < numOffers && safety < 120) {
     safety++;
 
     // Rarity weighting: mostly common/rare, occasional epic
     const rRoll = Math.random();
     let forcedRarity;
-    if (rRoll < 0.55)      forcedRarity = "common";
+    if      (rRoll < 0.55) forcedRarity = "common";
     else if (rRoll < 0.85) forcedRarity = "rare";
     else                   forcedRarity = "epic";
 
-    const it = makeLoot(tier, forcedRarity);
+    let it;
+
+    // About half the time, try to create a themed armor piece
+    if (Math.random() < 0.5) {
+      it = makeShopArmor(tier, forcedRarity, theme);
+    }
+
+    // Fallback / other half: use your existing generic loot generator
+    if (!it) {
+      it = makeLoot(tier, forcedRarity);
+    }
+
     if (!it) continue;
 
     // Avoid exact duplicates by name + slot
@@ -5491,7 +5679,7 @@ function genShop(cityId){
       continue;
     }
 
-    // Convert item value → shop price (slightly greedy)
+    // Ensure a price based on value & difficulty
     const baseValue = it.value != null ? it.value : 10;
     const priceMult = 1.15 + 0.04 * tier;      // higher tier cities charge more
     const greed     = 1 + 0.01 * level;        // a bit pricier as you level
@@ -6402,6 +6590,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
