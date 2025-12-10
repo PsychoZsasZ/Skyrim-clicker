@@ -5632,6 +5632,42 @@ function makeShopArmor(tier, rarity, theme){
   };
 }
 
+  // Ensure shop items never have NaN / broken stats
+function normalizeShopItem(it){
+  if (!it || typeof it !== "object") return null;
+
+  // Name fallback
+  if (!it.name) {
+    const slotLabel = (it.slot || "item").toUpperCase();
+    it.name = `Unknown ${slotLabel}`;
+  }
+
+  // Armor
+  if (it.armor != null) {
+    const a = Number(it.armor);
+    if (!Number.isFinite(a)) it.armor = 0;
+    else it.armor = Math.round(a);
+  }
+
+  // Damage
+  if (it.damage != null) {
+    const d = Number(it.damage);
+    if (!Number.isFinite(d)) it.damage = 0;
+    else it.damage = Math.round(d);
+  }
+
+  // Value (used to derive price)
+  if (it.value != null) {
+    const v = Number(it.value);
+    if (!Number.isFinite(v)) it.value = 10;
+    else it.value = Math.max(1, Math.round(v));
+  } else {
+    it.value = 10;
+  }
+
+  return it;
+}
+
 function genShop(cityId){
   const p = STATE.player || { level: 1, zone: 1 };
   if (!STATE.shop) STATE.shop = {};
@@ -5671,8 +5707,10 @@ function genShop(cityId){
     if (!it) {
       it = makeLoot(tier, forcedRarity);
     }
-
     if (!it) continue;
+
+    // 🔹 NEW: normalise to avoid NaN stats
+    it = normalizeShopItem(it);
 
     // Avoid exact duplicates by name + slot
     if (offers.some(o => o.name === it.name && o.slot === it.slot)) {
@@ -5680,7 +5718,7 @@ function genShop(cityId){
     }
 
     // Ensure a price based on value & difficulty
-    const baseValue = it.value != null ? it.value : 10;
+    const baseValue = Number.isFinite(it.value) ? it.value : 10;
     const priceMult = 1.15 + 0.04 * tier;      // higher tier cities charge more
     const greed     = 1 + 0.01 * level;        // a bit pricier as you level
 
@@ -6590,6 +6628,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
